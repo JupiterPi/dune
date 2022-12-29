@@ -26,7 +26,9 @@ enum class Faction(
         if (formerInfluenceLevel < 4 && influenceLevel >= 4) grantLevel4InfluenceEffect(player)
 
         if (influenceLevel >= 4 && influenceLevels.count { it.value >= influenceLevel } == 1) {
-            if (ally != null) ally!!.victoryPoints -= 1
+            ally.let {
+                if (it != null) it.victoryPoints -= 1
+            }
             ally = player
             player.victoryPoints += 1
         }

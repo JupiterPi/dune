@@ -131,6 +131,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             //TODO grant 1 intrigue card
+            AgentCardControl.CARTHAG.grantControlBonus()
         }
     ),
     ARRAKEEN(
@@ -138,6 +139,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.drawCardsFromDeck(1)
+            jupiterpi.dune.AgentCardControl.ARRAKEEN.grantControlBonus()
         }
     ),
 
@@ -163,6 +165,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
+            jupiterpi.dune.AgentCardControl.IMPERIAL_BASIN.grantControlBonus()
         }
     ),
     SELL_SPICE(

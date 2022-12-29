@@ -40,7 +40,7 @@ class Player(
     var hand: MutableList<AgentCard> = mutableListOf()
     var discardedCards: MutableList<AgentCard> = mutableListOf()
 
-    fun consumeFromDeck(amount: Int): List<AgentCard> {
+    private fun consumeFromDeck(amount: Int): List<AgentCard> {
         return mutableListOf<AgentCard>().apply {
             repeat(amount) {
                 if (deck.isEmpty()) {

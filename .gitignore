@@ -30,3 +30,6 @@ bin/
 
 Dune.iml
 .idea
+
+imgs/agent_cards/raw
+imgs/agent_cards/processed

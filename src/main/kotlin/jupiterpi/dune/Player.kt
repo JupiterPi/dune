@@ -41,15 +41,15 @@ class Player(
     var discardedCards: MutableList<AgentCard> = mutableListOf()
 
     fun consumeFromDeck(amount: Int): List<AgentCard> {
-        val cards = mutableListOf<AgentCard>()
-        repeat(amount) {
-            if (deck.isEmpty()) {
-                deck.addAll(discardedCards.shuffled())
-                discardedCards.clear()
+        return mutableListOf<AgentCard>().apply {
+            repeat(amount) {
+                if (deck.isEmpty()) {
+                    deck.addAll(discardedCards.shuffled())
+                    discardedCards.clear()
+                }
+                add(deck.removeFirst())
             }
-            cards.add(deck.removeFirst())
         }
-        return cards
     }
 
     fun drawCardsFromDeck(amount: Int) {

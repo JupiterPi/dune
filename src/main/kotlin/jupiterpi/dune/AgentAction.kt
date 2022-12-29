@@ -3,12 +3,13 @@ package jupiterpi.dune
 enum class AgentAction(
     val title: String,
     val symbol: AgentSymbol,
+    val faction: Faction?,
     private val checkUsabilityForPlayer: (player: Player) -> Boolean,
     val conflictAction: Boolean,
     private val applyEffectForPlayer: (player: Player) -> Unit,
 ) {
     CONSPIRACY(
-        "Conspiracy", AgentSymbol.IMPERATOR,
+        "Conspiracy", AgentSymbol.IMPERATOR, Faction.IMPERATOR,
         { player -> player.spice >= 4 }, false, { player ->
             player.spice -= 4
             player.solari += 2
@@ -17,13 +18,13 @@ enum class AgentAction(
         }
     ),
     WEALTH(
-        "Wealth", AgentSymbol.IMPERATOR,
+        "Wealth", AgentSymbol.IMPERATOR, Faction.IMPERATOR,
         { player -> true }, false, { player -> player.solari += 2 }
     ),
 
 
     HEIGHLINER(
-        "Heighliner", AgentSymbol.SPACING_GUILD,
+        "Heighliner", AgentSymbol.SPACING_GUILD, Faction.SPACING_GUILD,
         { player -> player.spice >= 6 }, true, { player ->
             player.spice -= 6
             player.troopsInGarrison += 5 //TODO troops could also be placed in conflict pool
@@ -31,7 +32,7 @@ enum class AgentAction(
         }
     ),
     FOLD_SPACE(
-        "Fold Space", AgentSymbol.SPACING_GUILD,
+        "Fold Space", AgentSymbol.SPACING_GUILD, Faction.SPACING_GUILD,
         { player -> true }, false, { player -> {
             //TODO grant Fold Space card
         } }
@@ -39,7 +40,7 @@ enum class AgentAction(
 
 
     SELECTIVE_BREEDING(
-        "Selective Breeding", AgentSymbol.BENE_GESSERIT,
+        "Selective Breeding", AgentSymbol.BENE_GESSERIT, Faction.BENE_GESSERIT,
         { player -> player.spice >= 2 }, false, { player ->
             player.spice -= 2
             //TODO remove one card
@@ -47,7 +48,7 @@ enum class AgentAction(
         }
     ),
     SECRETS(
-        "Secrets", AgentSymbol.BENE_GESSERIT,
+        "Secrets", AgentSymbol.BENE_GESSERIT, Faction.BENE_GESSERIT,
         { player -> true }, false, { player ->
             //TODO grant 1 intrigue card
             //TODO check other players for 4 intrigue cards...
@@ -56,20 +57,20 @@ enum class AgentAction(
 
 
     TOUGH_WARRIORS(
-        "Tough Warriors", AgentSymbol.FREMEN,
+        "Tough Warriors", AgentSymbol.FREMEN, Faction.FREMEN,
         { player -> player.water >= 1 }, true, { player ->
             player.water -= 1
             player.troopsInGarrison += 2 //TODO troops could also be placed in conflict pool
         }
     ),
     STILLSUIT(
-        "Stillsuit", AgentSymbol.FREMEN,
+        "Stillsuit", AgentSymbol.FREMEN, Faction.FREMEN,
         { player -> true }, true, { player -> player.water += 1 }
     ),
 
 
     HIGH_COUNCIL(
-        "High Council", AgentSymbol.LANDSRAAD,
+        "High Council", AgentSymbol.LANDSRAAD, null,
         { player ->
             //TODO check that player hasn't done this yet
             player.solari >= 5
@@ -79,14 +80,14 @@ enum class AgentAction(
         }
     ),
     SPEAKER_HALL(
-        "Speaker Hall", AgentSymbol.LANDSRAAD,
+        "Speaker Hall", AgentSymbol.LANDSRAAD, null,
         { player -> true }, false, { player ->
             player.troopsInGarrison += 1
             player.convictionPoints += 1
         }
     ),
     MENTAT(
-        "Mentat", AgentSymbol.LANDSRAAD,
+        "Mentat", AgentSymbol.LANDSRAAD, null,
         { player -> player.solari >= 2 }, false, { player ->
             player.solari -= 2
             player.drawCardsFromDeck(1)
@@ -94,14 +95,14 @@ enum class AgentAction(
         }
     ),
     COLLECT_TROUPS(
-        "Collect Troups", AgentSymbol.LANDSRAAD,
+        "Collect Troups", AgentSymbol.LANDSRAAD, null,
         { player -> player.solari >= 4 }, false, { player ->
             player.solari -= 4
             player.troopsInGarrison += 4
         }
     ),
     SWORD_MASTER(
-        "Sword Master", AgentSymbol.LANDSRAAD,
+        "Sword Master", AgentSymbol.LANDSRAAD, null,
         { player -> player.solari >= 8 }, false, { player ->
             player.solari -= 8
             //TODO grant 3rd agent
@@ -110,31 +111,30 @@ enum class AgentAction(
 
 
     SIETCH_TABR(
-        "Sietch Tabr", AgentSymbol.CITY,
+        "Sietch Tabr", AgentSymbol.CITY, null,
         { player ->
-            //TODO check for 2 influence points with fremen
-            true
+            Faction.FREMEN.getInfluenceLevel(player) >= 2
         }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.water += 1
         }
     ),
     RESEARCH_CENTER(
-        "Research Center", AgentSymbol.CITY,
+        "Research Center", AgentSymbol.CITY, null,
         { player -> player.water >= 2 }, true, { player ->
             player.water -= 2
             player.drawCardsFromDeck(3)
         }
     ),
     CARTHAG(
-        "Carthag", AgentSymbol.CITY,
+        "Carthag", AgentSymbol.CITY, null,
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             //TODO grant 1 intrigue card
         }
     ),
     ARRAKEEN(
-        "Arrakeen", AgentSymbol.CITY,
+        "Arrakeen", AgentSymbol.CITY, null,
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.drawCardsFromDeck(1)
@@ -143,7 +143,7 @@ enum class AgentAction(
 
 
     GREAT_PLAIN(
-        "Great Plain", AgentSymbol.SPICE,
+        "Great Plain", AgentSymbol.SPICE, null,
         { player -> player.water >= 2 }, true, { player ->
             player.water -= 2
             player.spice += 3
@@ -151,7 +151,7 @@ enum class AgentAction(
         }
     ),
     HAGGA_BASIN(
-        "Hagga Basin", AgentSymbol.SPICE,
+        "Hagga Basin", AgentSymbol.SPICE, null,
         { player -> player.water >= 1 }, true, { player ->
             player.water -= 1
             player.spice += 2
@@ -159,14 +159,14 @@ enum class AgentAction(
         }
     ),
     IMPERIAL_BASIN(
-        "Imperial Basin", AgentSymbol.SPICE,
+        "Imperial Basin", AgentSymbol.SPICE, null,
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
         }
     ),
     SELL_SPICE(
-        "Sell Spice", AgentSymbol.SPICE,
+        "Sell Spice", AgentSymbol.SPICE, null,
         //TODO better system to handle multiple options
         { player -> player.spice >= 2 }, false, { player ->
             player.spice -= 2 //TODO handle multiple options
@@ -174,7 +174,7 @@ enum class AgentAction(
         }
     ),
     MAKE_DEAL(
-        "Make Deal", AgentSymbol.SPICE,
+        "Make Deal", AgentSymbol.SPICE, null,
         { player -> true }, false, { player -> player.solari += 3 }
     );
 
@@ -187,6 +187,6 @@ enum class AgentAction(
     fun useForPlayer(player: Player) {
         applyEffectForPlayer(player)
         //TODO players can choose to play troops on conflict actions
-        //TODO raise influence level for factions
+        faction?.setInfluenceLevel(player, faction.getInfluenceLevel(player))
     }
 }

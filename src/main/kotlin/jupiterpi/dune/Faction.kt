@@ -6,15 +6,16 @@ enum class Faction(
 ) {
     IMPERATOR("Imperator", { player -> player.troopsInGarrison += 2 }),
     SPACING_GUILD("Spacing Guild", { player -> player.solari += 3 }),
-    BENE_GESSERIT("Bene Gesserit", { player ->
-        //TODO grant 1 intrigue card
-    }),
+    BENE_GESSERIT("Bene Gesserit", { player -> player.drawIntrigueCards(1) }),
     FREMEN("Fremen", { player -> player.water += 1 });
 
-    val influenceLevels: MutableMap<Player, Int> = mutableMapOf()
+    private val influenceLevels = mutableMapOf<Player, Int>()
     var ally: Player? = null
     fun getInfluenceLevel(player: Player): Int {
         return influenceLevels[player] ?: 0
+    }
+    fun raiseInfluenceLevel(player: Player, levels: Int) {
+        setInfluenceLevel(player, getInfluenceLevel(player) + levels)
     }
     fun setInfluenceLevel(player: Player, influenceLevel: Int) {
         val formerInfluenceLevel = getInfluenceLevel(player)

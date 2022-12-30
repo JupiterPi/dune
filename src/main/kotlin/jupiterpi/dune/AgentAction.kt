@@ -14,7 +14,7 @@ enum class AgentAction(
             player.spice -= 4
             player.solari += 2
             player.troopsInGarrison += 2
-            //TODO grant 1 intrigue card
+            player.drawIntrigueCards(1)
         }
     ),
     WEALTH(
@@ -50,8 +50,14 @@ enum class AgentAction(
     SECRETS(
         "Secrets", AgentSymbol.BENE_GESSERIT, Faction.BENE_GESSERIT,
         { player -> true }, false, { player ->
-            //TODO grant 1 intrigue card
-            //TODO check other players for 4 intrigue cards...
+            player.drawIntrigueCards(1)
+            player.game.players.forEach {
+                if (player.intrigueCards.size >= 4) {
+                    val card = it.intrigueCards.random()
+                    it.intrigueCards.remove(card)
+                    player.intrigueCards.add(card)
+                }
+            }
         }
     ),
 
@@ -130,8 +136,8 @@ enum class AgentAction(
         "Carthag", AgentSymbol.CITY, null,
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
-            //TODO grant 1 intrigue card
-            AgentCardControl.CARTHAG.grantControlBonus()
+            player.drawIntrigueCards(1)
+            AgentActionControl.CARTHAG.grantControlBonus()
         }
     ),
     ARRAKEEN(
@@ -139,7 +145,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.drawCardsFromDeck(1)
-            jupiterpi.dune.AgentCardControl.ARRAKEEN.grantControlBonus()
+            jupiterpi.dune.AgentActionControl.ARRAKEEN.grantControlBonus()
         }
     ),
 
@@ -165,7 +171,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
-            jupiterpi.dune.AgentCardControl.IMPERIAL_BASIN.grantControlBonus()
+            jupiterpi.dune.AgentActionControl.IMPERIAL_BASIN.grantControlBonus()
         }
     ),
     SELL_SPICE(
@@ -190,6 +196,6 @@ enum class AgentAction(
     fun useForPlayer(player: Player) {
         applyEffectForPlayer(player)
         //TODO players can choose to play troops on conflict actions
-        faction?.setInfluenceLevel(player, faction.getInfluenceLevel(player))
+        faction?.raiseInfluenceLevel(player, 1)
     }
 }

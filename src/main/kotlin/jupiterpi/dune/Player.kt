@@ -1,11 +1,7 @@
 package jupiterpi.dune
 
-const val maxUnusedControlMarkers = 3
-const val maxTotalAgents = 3
-
-const val totalTroops = 16
-
 class Player(
+    val game: Game,
     val name: String,
     val color: Color,
     val leader: Leader,
@@ -21,14 +17,13 @@ class Player(
     var spice = 0
     var water = 0
 
-    var unusedControlMarkers = 3
     var totalAgents = 2
     var troopsInGarrison = 0
 
     var convictionPoints = 0
     var victoryPoints = 1
 
-    var deck: MutableList<AgentCard> = mutableListOf(
+    var deck = mutableListOf(
         AgentCard.CONVINCING_ARGUMENT, AgentCard.CONVINCING_ARGUMENT,
         AgentCard.DAGGER, AgentCard.DAGGER,
         AgentCard.DIPLOMACY,
@@ -37,8 +32,8 @@ class Player(
         AgentCard.SEARCH_FOR_ALLIES,
         AgentCard.SIGNET_RING,
     )
-    var hand: MutableList<AgentCard> = mutableListOf()
-    var discardedCards: MutableList<AgentCard> = mutableListOf()
+    var hand = mutableListOf<AgentCard>()
+    var discardedCards = mutableListOf<AgentCard>()
 
     private fun consumeFromDeck(amount: Int): List<AgentCard> {
         return mutableListOf<AgentCard>().apply {
@@ -58,6 +53,14 @@ class Player(
 
     fun destroyCardFromHand(card: AgentCard) {
         hand.remove(card)
+    }
+
+    val intrigueCards = mutableListOf<IntrigueCard>()
+
+    fun drawIntrigueCards(amount: Int) {
+        repeat(amount) {
+            intrigueCards.add(game.drawIntrigueCard())
+        }
     }
 }
 

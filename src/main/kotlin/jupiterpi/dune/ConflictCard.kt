@@ -19,7 +19,7 @@ enum class ConflictCard(
     }),
     I_FIGHT_3("Fight (I)", 1, { first, second, third ->
         first.victoryPoints += 1
-        //TODO (for second) add 1 intrigue card
+        second.drawIntrigueCards(1)
         second.solari += 2
         third.solari += 2
     }),
@@ -37,22 +37,22 @@ enum class ConflictCard(
     }),
     II_SEE_THROUGH_CHAOS("See Through The Chaos (II)", 2, { first, second, third ->
         //TODO (for first) add mentat
-        //TODO (for first) add 1 intrigue card
+        first.drawIntrigueCards(1)
         first.solari += 2
-        //TODO (for second) add 1 intrigue card
+        second.drawIntrigueCards(1)
         second.solari += 2
         third.solari += 2
     }),
     II_LOOT_SUPPLIES("Loot Supplies (II)", 2, { first, second, third ->
-        //TODO (for first) add 1 intrigue card
+        first.drawIntrigueCards(1)
         first.spice += 3
         second.spice += 2
         third.spice += 1
     }),
     II_IN_THE_NIGHT("In The Night (II)", 2, { first, second, third ->
         //TODO (for first) add 1 influence for any
-        //TODO (for first) add 2 intrigue cards
-        //TODO (for second) add 1 intrigue card
+        first.drawIntrigueCards(2)
+        second.drawIntrigueCards(1)
         second.spice += 1
         //TODO (for third) add 1 intrigue card **OR** 1 spice
     }),
@@ -78,20 +78,20 @@ enum class ConflictCard(
     }),
     II_SIEGE_OF_ARRAKEEN("Siege Of Arrakeen (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentCardControl.ARRAKEEN.controlledBy = first
+        AgentActionControl.ARRAKEEN.controlledBy = first
         second.solari += 4
         third.solari += 2
     }),
     II_SIEGE_OF_CARTHAG("Siege Of Carthag (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentCardControl.CARTHAG.controlledBy = first
-        //TODO (for second) grant 1 intrigue card
+        AgentActionControl.CARTHAG.controlledBy = first
+        second.drawIntrigueCards(1)
         second.spice += 1
         third.spice += 1
     }),
     II_SECURE_IMPERIAL_BASIN("Secure The Imperial Basin (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentCardControl.IMPERIAL_BASIN.controlledBy = first
+        AgentActionControl.IMPERIAL_BASIN.controlledBy = first
         second.water += 2
         third.water += 1
     }),
@@ -99,28 +99,28 @@ enum class ConflictCard(
 
     III_GREAT_VISION("Great Vision (III)", 3, { first, second, third ->
         //TODO (for first) grant 2 influence with any
-        //TODO (for first) grant 1 intrigue card
-        //TODO (for second) grant 1 intrigue card
+        first.drawIntrigueCards(1)
+        second.drawIntrigueCards(1)
         second.spice += 3
         third.spice += 3
     }),
     III_BATTLE_OF_ARRAKEEN("Battle Of Arrakeen (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentCardControl.ARRAKEEN.controlledBy = first
+        AgentActionControl.ARRAKEEN.controlledBy = first
         //TODO (for second) choose 2 of: 1 intrigue card, 2 spice, 3 solari
-        //TODO (for third) grant 1 intrigue card
+        third.drawIntrigueCards(1)
         third.solari += 2
     }),
     III_BATTLE_OF_CARTHAG("Battle Of Carthag (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentCardControl.CARTHAG.controlledBy = first
-        //TODO (for second) grant 1 intrigue card
+        AgentActionControl.CARTHAG.controlledBy = first
+        second.drawIntrigueCards(1)
         second.spice += 3
         third.spice += 3
     }),
     III_BATTLE_OF_IMPERIAL_BASIN("Battle Of Imperial Basin (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentCardControl.IMPERIAL_BASIN.controlledBy = first
+        AgentActionControl.IMPERIAL_BASIN.controlledBy = first
         second.spice += 5
         third.spice += 3
     }),

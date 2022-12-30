@@ -8,11 +8,8 @@ class Game(
         private set
 
     init {
-        val conflictCards = ConflictCard.values()
         for (level in 1..3) {
-            val levelCards = conflictCards.filter { it.level == level }
-            val shuffledLevelCards = levelCards.shuffled()
-            conflictCardStack.addAll(shuffledLevelCards)
+            conflictCardStack.addAll(ConflictCard.values().filter { it.level == level }.shuffled())
         }
         drawNextConflictCard()
     }
@@ -20,4 +17,14 @@ class Game(
     private fun drawNextConflictCard() {
         activeConflictCard = conflictCardStack.removeFirst()
     }
+
+    private val intrigueCardStack = mutableListOf<IntrigueCard>()
+
+    init {
+        intrigueCardStack.addAll(IntrigueCard.values().flatMap {
+                card -> generateSequence { card }.take(card.amountInGame).toList()
+        })
+    }
+
+    fun drawIntrigueCard(): IntrigueCard = intrigueCardStack.removeFirst()
 }

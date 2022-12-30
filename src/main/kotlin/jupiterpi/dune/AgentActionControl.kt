@@ -1,6 +1,6 @@
 package jupiterpi.dune
 
-enum class AgentCardControl(
+enum class AgentActionControl(
     private val grantControlBonusToPlayer: (controlledBy: Player) -> Unit,
 ) {
     ARRAKEEN({ controlledBy -> controlledBy.solari += 1 }),

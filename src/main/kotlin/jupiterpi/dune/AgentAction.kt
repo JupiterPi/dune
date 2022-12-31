@@ -119,7 +119,7 @@ enum class AgentAction(
     SIETCH_TABR(
         "Sietch Tabr", AgentSymbol.CITY, null,
         { player ->
-            Faction.FREMEN.getInfluenceLevel(player) >= 2
+            player.getInfluenceLevel(Faction.FREMEN) >= 2
         }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.water += 1
@@ -137,7 +137,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.drawIntrigueCards(1)
-            AgentActionControl.CARTHAG.grantControlBonus()
+            player.game.grantControlBonus(AgentActionControl.CARTHAG)
         }
     ),
     ARRAKEEN(
@@ -145,7 +145,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
             player.drawCardsFromDeck(1)
-            jupiterpi.dune.AgentActionControl.ARRAKEEN.grantControlBonus()
+            player.game.grantControlBonus(AgentActionControl.ARRAKEEN)
         }
     ),
 
@@ -171,7 +171,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
-            jupiterpi.dune.AgentActionControl.IMPERIAL_BASIN.grantControlBonus()
+            player.game.grantControlBonus(AgentActionControl.IMPERIAL_BASIN)
         }
     ),
     SELL_SPICE(
@@ -196,6 +196,12 @@ enum class AgentAction(
     fun useForPlayer(player: Player) {
         applyEffectForPlayer(player)
         //TODO players can choose to play troops on conflict actions
-        faction?.raiseInfluenceLevel(player, 1)
+        when (symbol) {
+            AgentSymbol.IMPERATOR -> player.raiseInfluenceLevel(Faction.IMPERATOR, 1)
+            AgentSymbol.SPACING_GUILD -> player.raiseInfluenceLevel(Faction.SPACING_GUILD, 1)
+            AgentSymbol.BENE_GESSERIT -> player.raiseInfluenceLevel(Faction.BENE_GESSERIT, 1)
+            AgentSymbol.FREMEN -> player.raiseInfluenceLevel(Faction.FREMEN, 1)
+            else -> {}
+        }
     }
 }

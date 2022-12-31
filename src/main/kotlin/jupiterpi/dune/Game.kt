@@ -1,8 +1,10 @@
 package jupiterpi.dune
 
-class Game(
-    val players: List<Player>,
-) {
+class Game {
+    val players = mutableListOf<Player>()
+
+    // conflict cards
+
     private val conflictCardStack = mutableListOf<ConflictCard>()
     lateinit var activeConflictCard: ConflictCard
         private set
@@ -18,13 +20,30 @@ class Game(
         activeConflictCard = conflictCardStack.removeFirst()
     }
 
-    private val intrigueCardStack = mutableListOf<IntrigueCard>()
+    // intrigue cards
 
-    init {
-        intrigueCardStack.addAll(IntrigueCard.values().flatMap {
-                card -> generateSequence { card }.take(card.amountInGame).toList()
-        })
-    }
+    private val intrigueCardStack = IntrigueCard.values().flatMap { card -> generateSequence { card }.take(card.amountInGame).toList() }.toMutableList()
 
     fun drawIntrigueCard(): IntrigueCard = intrigueCardStack.removeFirst()
+
+    // allies
+
+    val allies = mutableMapOf<Faction, Player?>(
+        Faction.IMPERATOR to null,
+        Faction.SPACING_GUILD to null,
+        Faction.BENE_GESSERIT to null,
+        Faction.FREMEN to null,
+    )
+
+    // agent card control
+
+    val control = mutableMapOf<AgentActionControl, Player?>(
+        AgentActionControl.ARRAKEEN to null,
+        AgentActionControl.CARTHAG to null,
+        AgentActionControl.IMPERIAL_BASIN to null,
+    )
+
+    fun grantControlBonus(agentActionControl: AgentActionControl) {
+        agentActionControl.grantControlBonusToPlayer(control[agentActionControl]!!)
+    }
 }

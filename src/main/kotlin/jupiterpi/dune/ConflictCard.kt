@@ -78,20 +78,20 @@ enum class ConflictCard(
     }),
     II_SIEGE_OF_ARRAKEEN("Siege Of Arrakeen (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentActionControl.ARRAKEEN.controlledBy = first
+        first.game.control[AgentActionControl.ARRAKEEN] = first
         second.solari += 4
         third.solari += 2
     }),
     II_SIEGE_OF_CARTHAG("Siege Of Carthag (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentActionControl.CARTHAG.controlledBy = first
+        first.game.control[AgentActionControl.CARTHAG] = first
         second.drawIntrigueCards(1)
         second.spice += 1
         third.spice += 1
     }),
     II_SECURE_IMPERIAL_BASIN("Secure The Imperial Basin (II)", 2, { first, second, third ->
         first.victoryPoints += 1
-        AgentActionControl.IMPERIAL_BASIN.controlledBy = first
+        first.game.control[AgentActionControl.IMPERIAL_BASIN] = first
         second.water += 2
         third.water += 1
     }),
@@ -106,21 +106,21 @@ enum class ConflictCard(
     }),
     III_BATTLE_OF_ARRAKEEN("Battle Of Arrakeen (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentActionControl.ARRAKEEN.controlledBy = first
+        first.game.control[AgentActionControl.ARRAKEEN] = first
         //TODO (for second) choose 2 of: 1 intrigue card, 2 spice, 3 solari
         third.drawIntrigueCards(1)
         third.solari += 2
     }),
     III_BATTLE_OF_CARTHAG("Battle Of Carthag (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentActionControl.CARTHAG.controlledBy = first
+        first.game.control[AgentActionControl.CARTHAG] = first
         second.drawIntrigueCards(1)
         second.spice += 3
         third.spice += 3
     }),
     III_BATTLE_OF_IMPERIAL_BASIN("Battle Of Imperial Basin (III)", 3, { first, second, third ->
         first.victoryPoints += 2
-        AgentActionControl.IMPERIAL_BASIN.controlledBy = first
+        first.game.control[AgentActionControl.IMPERIAL_BASIN] = first
         second.spice += 5
         third.spice += 3
     }),

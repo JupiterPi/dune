@@ -38,7 +38,7 @@ enum class AgentCard(
     SEARCH_FOR_ALLIES(
         "Search for Allies", 0, 0,
         listOf(AgentSymbol.IMPERATOR, AgentSymbol.SPACING_GUILD, AgentSymbol.BENE_GESSERIT, AgentSymbol.FREMEN),
-        { player -> player.destroyCardFromHand(jupiterpi.dune.AgentCard.SEARCH_FOR_ALLIES) }, {}
+        { player -> player.destroyCardFromHand(AgentCard.SEARCH_FOR_ALLIES) }, {}
     ),
     SIGNET_RING(
         "Signet Ring", 0, 0,

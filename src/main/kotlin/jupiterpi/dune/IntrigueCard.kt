@@ -15,7 +15,7 @@ enum class IntrigueCard(
     ),
     IMPERATORS_FAVORITE(
         "Imperator's Favorite", 1, listOf(Type.PLOT), { player ->
-            Faction.IMPERATOR.raiseInfluenceLevel(player, 1)
+            player.raiseInfluenceLevel(Faction.IMPERATOR, 1)
         }
     ),
     WATER_UNION(

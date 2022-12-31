@@ -13,6 +13,8 @@ class Player(
         YELLOW(0xFFFF00),
     }
 
+    // basic resources
+
     var solari = 0
     var spice = 0
     var water = 0
@@ -22,6 +24,8 @@ class Player(
 
     var convictionPoints = 0
     var victoryPoints = 1
+
+    // deck
 
     var deck = mutableListOf(
         AgentCard.CONVINCING_ARGUMENT, AgentCard.CONVINCING_ARGUMENT,
@@ -55,11 +59,44 @@ class Player(
         hand.remove(card)
     }
 
+    // intrigue cards
+
     val intrigueCards = mutableListOf<IntrigueCard>()
 
     fun drawIntrigueCards(amount: Int) {
         repeat(amount) {
             intrigueCards.add(game.drawIntrigueCard())
+        }
+    }
+
+    // influence
+
+    private val influenceLevels = mutableMapOf(
+        Faction.IMPERATOR to 0,
+        Faction.SPACING_GUILD to 0,
+        Faction.BENE_GESSERIT to 0,
+        Faction.FREMEN to 0,
+    )
+
+    fun getInfluenceLevel(faction: Faction) = influenceLevels[faction] ?: 0
+
+    fun raiseInfluenceLevel(faction: Faction, raiseBy: Int) = setInfluenceLevel(faction, getInfluenceLevel(faction) + raiseBy)
+
+    fun setInfluenceLevel(faction: Faction, influenceLevel: Int) {
+        val formerInfluenceLevel = getInfluenceLevel(faction)
+        influenceLevels[faction] = influenceLevel
+
+        if (formerInfluenceLevel < 2 && influenceLevel >= 2) victoryPoints += 1
+        if (formerInfluenceLevel >= 2 && influenceLevel < 2) victoryPoints -= 1
+
+        if (formerInfluenceLevel < 4 && influenceLevel >= 4) faction.grantLevel4InfluenceEffect(this)
+
+        if (influenceLevel >= 4 && influenceLevels.count { it.value >= influenceLevel } == 1) {
+            game.allies[faction].let {
+                if (it != null) it.victoryPoints -= 1
+            }
+            game.allies[faction] = this
+            victoryPoints += 1
         }
     }
 }

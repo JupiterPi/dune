@@ -4,7 +4,7 @@ enum class AgentAction(
     val title: String,
     val symbol: AgentSymbol,
     val faction: Faction?,
-    private val checkUsabilityForPlayer: (player: Player) -> Boolean,
+    val usableForPlayer: (player: Player) -> Boolean,
     val conflictAction: Boolean,
     private val applyEffectForPlayer: (player: Player) -> Unit,
 ) {
@@ -78,11 +78,10 @@ enum class AgentAction(
     HIGH_COUNCIL(
         "High Council", AgentSymbol.LANDSRAAD, null,
         { player ->
-            //TODO check that player hasn't done this yet
-            player.solari >= 5
+            !player.game.highCouncilMembers.contains(player) && player.solari >= 5
         }, false, { player ->
             player.solari -= 5
-            //TODO grant seat in high council
+            player.game.highCouncilMembers.add(player)
         }
     ),
     SPEAKER_HALL(
@@ -155,7 +154,7 @@ enum class AgentAction(
         { player -> player.water >= 2 }, true, { player ->
             player.water -= 2
             player.spice += 3
-            //TODO grant additional aggregated spice
+            player.spice += player.game.consumeAggregatedSpice(AgentAction.GREAT_PLAIN)
         }
     ),
     HAGGA_BASIN(
@@ -163,7 +162,7 @@ enum class AgentAction(
         { player -> player.water >= 1 }, true, { player ->
             player.water -= 1
             player.spice += 2
-            //TODO grant additional aggregated spice
+            player.spice += player.game.consumeAggregatedSpice(AgentAction.HAGGA_BASIN)
         }
     ),
     IMPERIAL_BASIN(
@@ -171,7 +170,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
-            player.game.grantControlBonus(AgentActionControl.IMPERIAL_BASIN)
+            player.spice += player.game.consumeAggregatedSpice(AgentAction.IMPERIAL_BASIN)
         }
     ),
     SELL_SPICE(
@@ -187,13 +186,8 @@ enum class AgentAction(
         { player -> true }, false, { player -> player.solari += 3 }
     );
 
-
-    fun usableForPlayer(player: Player): Boolean {
-        //TODO check if action is blocked
-        return checkUsabilityForPlayer(player)
-    }
-
     fun useForPlayer(player: Player) {
+        player.game.blockAgentAction(this)
         applyEffectForPlayer(player)
         //TODO players can choose to play troops on conflict actions
         when (symbol) {

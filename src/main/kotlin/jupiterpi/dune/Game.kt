@@ -46,4 +46,57 @@ class Game {
     fun grantControlBonus(agentActionControl: AgentActionControl) {
         agentActionControl.grantControlBonusToPlayer(control[agentActionControl]!!)
     }
+
+    // agent actions
+
+    val availableAgentActions = mutableSetOf<AgentAction>()
+
+    init { refreshAvailableAgentActions() }
+    private fun refreshAvailableAgentActions() {
+        availableAgentActions.clear()
+        availableAgentActions.addAll(AgentAction.values())
+    }
+
+    fun blockAgentAction(agentAction: AgentAction) {
+        availableAgentActions.remove(agentAction)
+    }
+
+    // agent actions: high council
+
+    val highCouncilMembers = mutableSetOf<Player>()
+
+    fun grantHighCouncilBenefits() {
+        highCouncilMembers.forEach { it.convictionPoints += 2 }
+    }
+
+    // agent actions: aggregated spice
+
+    private val aggregatedSpice = mutableMapOf(
+        AgentAction.GREAT_PLAIN to 0,
+        AgentAction.HAGGA_BASIN to 0,
+        AgentAction.IMPERIAL_BASIN to 0,
+    )
+
+    private val spiceAggregationActionVisited = mutableMapOf(
+        AgentAction.GREAT_PLAIN to false,
+        AgentAction.HAGGA_BASIN to false,
+        AgentAction.IMPERIAL_BASIN to false,
+    )
+
+    fun aggregateSpice() {
+        aggregatedSpice.keys.forEach { action ->
+            if (spiceAggregationActionVisited[action] == true) {
+                spiceAggregationActionVisited[action] = false
+            } else {
+                aggregatedSpice[action] = aggregatedSpice[action]!! + 1
+            }
+        }
+    }
+
+    fun consumeAggregatedSpice(agentAction: AgentAction): Int {
+        spiceAggregationActionVisited[agentAction] = true
+        val spice = aggregatedSpice[agentAction] ?: 0
+        aggregatedSpice[agentAction] = 0
+        return spice
+    }
 }

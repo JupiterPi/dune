@@ -33,9 +33,9 @@ enum class AgentAction(
     ),
     FOLD_SPACE(
         "Fold Space", AgentSymbol.SPACING_GUILD, Faction.SPACING_GUILD,
-        { player -> true }, false, { player -> {
-            //TODO grant Fold Space card
-        } }
+        { player -> true }, false, { player ->
+            player.discardedCards.add(AgentCard.FOLD_SPACE)
+        }
     ),
 
 
@@ -99,8 +99,8 @@ enum class AgentAction(
             //TODO grant mentat
         }
     ),
-    COLLECT_TROUPS(
-        "Collect Troups", AgentSymbol.LANDSRAAD, null,
+    COLLECT_TROOPS(
+        "Collect Troops", AgentSymbol.LANDSRAAD, null,
         { player -> player.solari >= 4 }, false, { player ->
             player.solari -= 4
             player.troopsInGarrison += 4
@@ -154,7 +154,7 @@ enum class AgentAction(
         { player -> player.water >= 2 }, true, { player ->
             player.water -= 2
             player.spice += 3
-            player.spice += player.game.consumeAggregatedSpice(AgentAction.GREAT_PLAIN)
+            player.spice += player.game.consumeAggregatedSpice(GREAT_PLAIN)
         }
     ),
     HAGGA_BASIN(
@@ -162,7 +162,7 @@ enum class AgentAction(
         { player -> player.water >= 1 }, true, { player ->
             player.water -= 1
             player.spice += 2
-            player.spice += player.game.consumeAggregatedSpice(AgentAction.HAGGA_BASIN)
+            player.spice += player.game.consumeAggregatedSpice(HAGGA_BASIN)
         }
     ),
     IMPERIAL_BASIN(
@@ -170,7 +170,7 @@ enum class AgentAction(
         { player -> true }, true, { player ->
             player.spice += 1
             //TODO grant additional aggregated spice
-            player.spice += player.game.consumeAggregatedSpice(AgentAction.IMPERIAL_BASIN)
+            player.spice += player.game.consumeAggregatedSpice(IMPERIAL_BASIN)
         }
     ),
     SELL_SPICE(

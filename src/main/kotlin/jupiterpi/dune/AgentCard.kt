@@ -38,11 +38,21 @@ enum class AgentCard(
     SEARCH_FOR_ALLIES(
         "Search for Allies", 0, 0,
         listOf(AgentSymbol.IMPERATOR, AgentSymbol.SPACING_GUILD, AgentSymbol.BENE_GESSERIT, AgentSymbol.FREMEN),
-        { player -> player.destroyCardFromHand(AgentCard.SEARCH_FOR_ALLIES) }, {}
+        { player -> player.destroyCardFromHand(SEARCH_FOR_ALLIES) }, {}
     ),
     SIGNET_RING(
         "Signet Ring", 0, 0,
         listOf(AgentSymbol.LANDSRAAD, AgentSymbol.CITY, AgentSymbol.SPICE),
         { player -> player.leader.signetRingAction(player) }, { player -> player.convictionPoints += 1 }
     ),
+
+
+    FOLD_SPACE(
+        "Fold Space", 0, 0,
+        AgentSymbol.values().toList(),
+        { player ->
+            player.drawCardsFromDeck(1)
+            player.destroyCardFromHand(FOLD_SPACE)
+        }, {}
+    )
 }

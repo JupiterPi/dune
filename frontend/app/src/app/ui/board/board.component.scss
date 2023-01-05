@@ -1,0 +1,82 @@
+#container {
+  display: inline-block;
+  width: 1440px;
+  height: 1440px;
+
+  background-image: url("/assets/board.png");
+  background-size: 1440px;
+}
+
+svg {
+  height: 1440px;
+  width: 1440px;
+
+  .influence_level, .garrison, .conflict_zone, .victory_points, .military_strength {
+    fill: white;
+    opacity: 0;
+
+    /*&:hover {
+      opacity: 10%;
+    }*/
+  }
+
+  .control, .high_council {
+    stroke: white;
+    stroke-width: 2px;
+
+    &:not(.taken) {
+      fill: transparent;
+    }
+  }
+
+  .action {
+    stroke-width: 3px;
+    fill: transparent;
+    rx: 5px;
+    ry: 5px;
+
+    &.available {
+      stroke: #5cb64e;
+    }
+
+    &:not(.available) {
+      stroke: #d54343;
+    }
+  }
+
+  .sandworm {
+    stroke: white;
+    stroke-width: 2px;
+    fill: #b2b2b2;
+    fill-opacity: 0;
+
+    &.active {
+      fill-opacity: 0.5;
+    }
+  }
+
+  text {
+    text-align: center;
+    text-anchor: middle;
+    font-family: "Roboto Light", sans-serif;
+
+    &.sandworm-text {
+      font-size: 25px;
+
+      &:not(.active) {
+        display: none;
+      }
+    }
+
+    &.garrison-text, &.conflict_zone-text {
+      font-size: 47.8px;
+    }
+  }
+
+  .influence_dot, .military_strength_dot, .victory_points_dot {
+    &:not(.active) {
+      fill: black;
+      fill-opacity: 0.1;
+    }
+  }
+}

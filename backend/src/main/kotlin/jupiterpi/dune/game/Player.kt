@@ -7,10 +7,10 @@ class Player(
     val leader: Leader,
 ) {
     enum class Color(val rgb: Int) {
-        RED(0xFF0000),
-        GREEN(0x00FF00),
-        BLUE(0x0000FF),
-        YELLOW(0xFFFF00),
+        RED(0xF23838),
+        GREEN(0x33A650),
+        BLUE(0x448FF2),
+        YELLOW(0xF2B705),
     }
 
     // basic resources
@@ -71,7 +71,7 @@ class Player(
 
     // influence
 
-    private val influenceLevels = mutableMapOf(
+    val influenceLevels = mutableMapOf(
         Faction.IMPERATOR to 0,
         Faction.SPACING_GUILD to 0,
         Faction.BENE_GESSERIT to 0,

@@ -71,7 +71,7 @@ class Game {
 
     // agent actions: aggregated spice
 
-    private val aggregatedSpice = mutableMapOf(
+    val aggregatedSpice = mutableMapOf(
         AgentAction.GREAT_PLAIN to 0,
         AgentAction.HAGGA_BASIN to 0,
         AgentAction.IMPERIAL_BASIN to 0,

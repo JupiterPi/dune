@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {SocketService} from "./socket.service";
+import {BehaviorSubject} from "rxjs";
 
 export type Game = {
   players: Player[],
@@ -46,4 +48,35 @@ export type Leader = {
 @Injectable({
   providedIn: 'root'
 })
-export class GameService {}
+export class GameService {
+  private game: BehaviorSubject<Game> = new BehaviorSubject<Game>({
+    players: [],
+    allies: {
+      IMPERATOR: undefined,
+      SPACING_GUILD: undefined,
+      BENE_GESSERIT: undefined,
+      FREMEN: undefined,
+    },
+    control: {
+      ARRAKEEN: undefined,
+      CARTHAG: undefined,
+      IMPERIAL_BASIN: undefined,
+    },
+    highCouncilMembers: [],
+    aggregatedSpice: {
+      GREAT_PLAIN: 0,
+      HAGGA_BASIN: 0,
+      IMPERIAL_BASIN: 0,
+    },
+  });
+
+  constructor(private socket: SocketService) {
+    this.socket.onMessage("/topic/game").subscribe(game => {
+      this.game.next(game as Game);
+    });
+  }
+
+  getGame() {
+    return this.game;
+  }
+}

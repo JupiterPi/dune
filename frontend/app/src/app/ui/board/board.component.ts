@@ -1,5 +1,5 @@
 import {Component, ElementRef, Inject, OnInit} from '@angular/core';
-import {Game} from "../../game.service";
+import {Game, GameService} from "../../game.service";
 import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
 
 @Component({
@@ -8,7 +8,7 @@ import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements OnInit {
-  state: Game = {
+  /*state: Game = {
     players: [
       {
         name: "Player 1",
@@ -66,9 +66,16 @@ export class BoardComponent implements OnInit {
       HAGGA_BASIN: 1,
       IMPERIAL_BASIN: 2,
     }
-  }
+  }*/
 
-  constructor(@Inject(ElementRef) private elementRef: ElementRef) {}
+  constructor(@Inject(ElementRef) private elementRef: ElementRef, private game: GameService) {}
+
+  ngOnInit(): void {
+    this.prepareSVGElements();
+    this.game.getGame().subscribe(game => {
+      this.renderGame(game);
+    });
+  }
 
   actions = [
     "CONSPIRACY", "WEALTH", "HEIGHLINER", "FOLD_SPACE", "SELECTIVE_BREEDING", "SECRETS", "TOUGH_WARRIORS", "STILLSUIT", "HIGH_COUNCIL", "SPEAKER_HALL", "MENTAT", "COLLECT_TROOPS", "SWORD_MASTER", "SIETCH_TABR", "RESEARCH_CENTER", "CARTHAG", "ARRAKEEN", "GREAT_PLAIN", "HAGGA_BASIN", "IMPERIAL_BASIN", "SELL_SPICE", "MAKE_DEAL"
@@ -82,11 +89,6 @@ export class BoardComponent implements OnInit {
   sandworms = [
     "GREAT_PLAIN", "HAGGA_BASIN", "IMPERIAL_BASIN"
   ];
-
-  ngOnInit(): void {
-    this.prepareSVGElements();
-    this.renderGame(this.state);
-  }
 
   private prepareSVGElements() {
     this.applyToElement("svg *", e => {

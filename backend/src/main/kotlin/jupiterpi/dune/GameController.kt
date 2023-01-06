@@ -5,7 +5,6 @@ import jupiterpi.dune.game.Leader
 import jupiterpi.dune.game.Player
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
-import java.awt.Color
 
 data class GameDTO(
     val players: List<PlayerDTO>,

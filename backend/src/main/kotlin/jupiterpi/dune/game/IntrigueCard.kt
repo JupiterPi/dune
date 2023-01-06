@@ -1,4 +1,4 @@
-package jupiterpi.dune
+package jupiterpi.dune.game
 
 enum class IntrigueCard(
     val title: String,

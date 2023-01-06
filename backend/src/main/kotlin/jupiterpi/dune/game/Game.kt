@@ -1,4 +1,4 @@
-package jupiterpi.dune
+package jupiterpi.dune.game
 
 class Game {
     val players = mutableListOf<Player>()

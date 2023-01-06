@@ -1,4 +1,4 @@
-package jupiterpi.dune
+package jupiterpi.dune.game
 
 class Player(
     val game: Game,

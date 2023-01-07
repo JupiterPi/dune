@@ -1,6 +1,16 @@
 package jupiterpi.dune.game
 
-class Game {
+import jupiterpi.dune.Handler
+
+class Game(
+    private val handler: Handler
+) {
+    fun start() {
+        println("started")
+        val response = handler.requestTest1(players[0], "conteent")
+        println("response: $response")
+    }
+
     val players = mutableListOf<Player>()
 
     // conflict cards

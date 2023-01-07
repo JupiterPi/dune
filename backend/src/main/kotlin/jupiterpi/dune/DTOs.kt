@@ -79,15 +79,3 @@ data class IntrigueCardDTO(
         intrigueCard.title
     )
 }
-
-@Controller
-class GameController {
-    @SubscribeMapping("/game")
-    fun getGame() = GameDTO(game)
-
-    @SubscribeMapping("/player/{name}/game")
-    fun getPlayerGame(@DestinationVariable("name") playerName: String): PlayerGameDTO? {
-        val player = game.players.find { it.name == playerName }
-        return if (player == null) null else PlayerGameDTO(player)
-    }
-}

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Game, GameService, PlayerGame} from "../../game.service";
+import {RequestsService} from "../../requests.service";
 
 @Component({
   selector: 'app-game',
@@ -10,7 +11,7 @@ export class GameComponent implements OnInit {
   game?: Game;
   playerGame?: PlayerGame;
 
-  constructor(private gameService: GameService) {}
+  constructor(private gameService: GameService, private requests: RequestsService) {}
 
   ngOnInit(): void {
     this.gameService.getGame().subscribe(game => {
@@ -18,6 +19,21 @@ export class GameComponent implements OnInit {
     });
     this.gameService.getPlayerGame().subscribe(playerGame => {
       this.playerGame = playerGame;
+    });
+
+    /*this.requests.handleRequests(request => {
+      console.log(request);
+      return {
+        requestId: request.id,
+        content: "reponsee"
+      };
+    });*/
+
+    this.requests.getRequests().subscribe(request => {
+      this.requests.sendResponse({
+        requestId: request.id,
+        content: "responsee2"
+      });
     });
   }
 }

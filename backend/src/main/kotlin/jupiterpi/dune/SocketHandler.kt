@@ -1,6 +1,6 @@
 package jupiterpi.dune
 
-import jupiterpi.dune.game.Player
+import jupiterpi.dune.game.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -25,8 +25,20 @@ class SocketHandler(
         }
     }
 
-    override fun requestTest1(player: Player, content: String): String
-    = request(player, UserRequest("TEST1", content)).content
+    override fun requestPlayerActionType(player: Player): Game.PlayerActionType
+    = Game.PlayerActionType.valueOf(
+        request(player, UserRequest("PLAYER_ACTION_TYPE")).content
+    )
+
+    override fun requestAgentCard(player: Player): AgentCard
+    = AgentCard.valueOf(
+        request(player, UserRequest("AGENT_CARD")).content
+    )
+
+    override fun requestAgentAction(player: Player): AgentAction
+    = AgentAction.valueOf(
+        request(player, UserRequest("AGENT_ACTION")).content
+    )
 
     private val responses = mutableMapOf<String, UserResponse>()
 
@@ -53,7 +65,7 @@ class SocketHandler(
 
 data class UserRequest(
     val type: String,
-    val content: String,
+    val content: String? = null,
 ) {
     val id = UUID.randomUUID().toString()
 }

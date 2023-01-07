@@ -32,7 +32,7 @@ fun main() {
     thread {
         runBlocking {
             delay(1000 * 5)
-            game.start()
+            game.run()
         }
     }
 }

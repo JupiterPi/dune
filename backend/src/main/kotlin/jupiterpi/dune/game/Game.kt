@@ -5,12 +5,6 @@ import jupiterpi.dune.Handler
 class Game(
     private val handler: Handler
 ) {
-    fun start() {
-        println("started")
-        val response = handler.requestTest1(players[0], "conteent")
-        println("response: $response")
-    }
-
     val players = mutableListOf<Player>()
 
     // conflict cards
@@ -23,7 +17,6 @@ class Game(
         for (level in 1..3) {
             conflictCardStack.addAll(ConflictCard.values().filter { it.level == level }.shuffled())
         }
-        drawNextConflictCard()
     }
 
     private fun drawNextConflictCard() {
@@ -115,5 +108,87 @@ class Game(
         val spice = aggregatedSpice[agentAction] ?: 0
         aggregatedSpice[agentAction] = 0
         return spice
+    }
+
+    // ----- run -----
+
+    var lifecyclePhase: LifecyclePhase = LifecyclePhase.NOT_STARTED
+        private set
+
+    fun run() {
+        while (true) {
+
+            // --- ROUND_START ---
+            lifecyclePhase = LifecyclePhase.ROUND_START
+
+            drawNextConflictCard()
+
+            players.forEach {
+                it.drawCardsFromDeck(5)
+            }
+
+            // --- PLAYERS ---
+            lifecyclePhase = LifecyclePhase.PLAYERS
+
+            val activePlayers = players.toMutableList()
+            while (activePlayers.isNotEmpty()) {
+                val playersToRemove = mutableListOf<Player>()
+                players.forEach { player ->
+
+                    //TODO check if agent left
+                    when (handler.requestPlayerActionType(player)) {
+                        PlayerActionType.AGENT_ACTION -> {
+
+                            val agentCard = handler.requestAgentCard(player)
+                            val agentAction = handler.requestAgentAction(player)
+                            if (agentAction.isUsableForPlayer(player)) {
+                                agentAction.useForPlayer(player)
+                                //TODO block card
+                            }
+
+                        }
+                        PlayerActionType.UNCOVER_ACTION -> {
+
+                            player.hand.forEach {
+                                it.uncoverEffect(player)
+                            }
+                            //TODO ...
+                            playersToRemove.add(player)
+
+                        }
+                    }
+
+                }
+                activePlayers.removeAll(playersToRemove)
+            }
+
+            // --- CONFLICT ---
+            lifecyclePhase = LifecyclePhase.CONFLICT
+            //TODO ...
+
+            // --- SANDWORMS ---
+            lifecyclePhase = LifecyclePhase.SANDWORMS
+            aggregateSpice()
+
+            // --- RECALL ---
+            lifecyclePhase = LifecyclePhase.RECALL
+            //TODO ...
+
+        }
+    }
+
+    enum class LifecyclePhase(
+        val title: String,
+    ) {
+        NOT_STARTED("Not Started"),
+        ROUND_START("Round Start"),
+        PLAYERS("Players' Turns"),
+        CONFLICT("Conflict"),
+        SANDWORMS("Sandworms"),
+        RECALL("Recall"),
+    }
+
+    enum class PlayerActionType {
+        AGENT_ACTION, UNCOVER_ACTION
     }
 }

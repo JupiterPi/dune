@@ -4,7 +4,7 @@ enum class AgentAction(
     val title: String,
     val symbol: AgentSymbol,
     val faction: Faction?,
-    val usableForPlayer: (player: Player) -> Boolean,
+    private val usableForPlayer: (player: Player) -> Boolean,
     val conflictAction: Boolean,
     private val applyEffectForPlayer: (player: Player) -> Unit,
 ) {
@@ -185,6 +185,11 @@ enum class AgentAction(
         "Make Deal", AgentSymbol.SPICE, null,
         { player -> true }, false, { player -> player.solari += 3 }
     );
+
+    fun isUsableForPlayer(player: Player): Boolean {
+        //TODO check if agent symbol available
+        return this.usableForPlayer(player)
+    }
 
     fun useForPlayer(player: Player) {
         player.game.blockAgentAction(this)

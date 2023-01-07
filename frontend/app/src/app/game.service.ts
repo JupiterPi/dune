@@ -45,6 +45,22 @@ export type Leader = {
   name: string,
 }
 
+export type PlayerGame = {
+  hand: AgentCard[],
+  intrigueCards: IntrigueCard[],
+}
+
+export type AgentCard = {
+  id: string,
+  title: string,
+  agentSymbols: string[],
+}
+
+export type IntrigueCard = {
+  id: string,
+  title: string,
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -69,14 +85,25 @@ export class GameService {
       IMPERIAL_BASIN: 0,
     },
   });
+  private playerGame: BehaviorSubject<PlayerGame> = new BehaviorSubject<PlayerGame>({
+    hand: [],
+    intrigueCards: [],
+  });
 
   constructor(private socket: SocketService) {
     this.socket.onMessage("/topic/game").subscribe(game => {
       this.game.next(game as Game);
     });
+    this.socket.onMessage("/topic/player/Player1/game").subscribe(playerGame => {
+      this.playerGame.next(playerGame as PlayerGame);
+    });
   }
 
   getGame() {
     return this.game;
+  }
+
+  getPlayerGame() {
+    return this.playerGame;
   }
 }

@@ -24,4 +24,24 @@
     </div>
 
   </div>
+
+  <div *ngIf="playerGame" id="player-game">
+
+    <div>
+      <b>Hand</b>:
+      <br>
+      <ng-container *ngFor="let card of playerGame.hand">
+        {{card.title}} <br>
+      </ng-container>
+    </div>
+
+    <div>
+      <b>Intrigue Cards</b>:
+      <br>
+      <ng-container *ngFor="let intrigueCard of playerGame.intrigueCards">
+        {{intrigueCard.title}} <br>
+      </ng-container>
+    </div>
+
+  </div>
 </div>

@@ -1,8 +1,7 @@
 package jupiterpi.dune
 
-import jupiterpi.dune.game.Game
-import jupiterpi.dune.game.Leader
-import jupiterpi.dune.game.Player
+import jupiterpi.dune.game.*
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
 
@@ -49,8 +48,46 @@ data class LeaderDTO(
     constructor(leader: Leader) : this(leader.name, leader.title)
 }
 
+data class PlayerGameDTO(
+    val hand: List<AgentCardDTO>,
+    val intrigueCards: List<IntrigueCardDTO>,
+) {
+    constructor(player: Player) : this(
+        player.hand.map { AgentCardDTO(it) },
+        player.intrigueCards.map { IntrigueCardDTO(it) }
+    )
+}
+
+data class AgentCardDTO(
+    val id: String,
+    val title: String,
+    val agentSymbols: List<String>,
+) {
+    constructor(agentCard: AgentCard) : this(
+        agentCard.name,
+        agentCard.title,
+        agentCard.agentSymbols.map { it.name }
+    )
+}
+
+data class IntrigueCardDTO(
+    val id: String,
+    val title: String,
+) {
+    constructor(intrigueCard: IntrigueCard) : this(
+        intrigueCard.name,
+        intrigueCard.title
+    )
+}
+
 @Controller
 class GameController {
     @SubscribeMapping("/game")
     fun getGame() = GameDTO(game)
+
+    @SubscribeMapping("/player/{name}/game")
+    fun getPlayerGame(@DestinationVariable("name") playerName: String): PlayerGameDTO? {
+        val player = game.players.find { it.name == playerName }
+        return if (player == null) null else PlayerGameDTO(player)
+    }
 }

@@ -16,7 +16,7 @@ export class SocketService implements OnDestroy {
   private state: BehaviorSubject<SocketClientState>;
 
   constructor() {
-    this.client = Stomp.over(new SockJS(environment.socketUrl));
+    this.client = Stomp.over(() => new SockJS(environment.socketUrl));
     this.state = new BehaviorSubject<SocketClientState>(SocketClientState.ATTEMPTING);
     this.client.connect({}, () => {
       this.state?.next(SocketClientState.CONNECTED);

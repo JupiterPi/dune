@@ -89,6 +89,12 @@ export class BoardComponent implements OnInit {
   sandworms = [
     "GREAT_PLAIN", "HAGGA_BASIN", "IMPERIAL_BASIN"
   ];
+  lifecycle = [
+    "ROUND_START", "PLAYERS", "CONFLICT", "SANDWORMS", "RECALL"
+  ];
+  conflict_cards = [
+    "STACK", "ACTIVE"
+  ];
 
   private prepareSVGElements() {
     this.applyToElement("svg *", e => {
@@ -191,6 +197,20 @@ export class BoardComponent implements OnInit {
         dots[i1].classList.add("victory_points_dot");
       });
     }
+
+    // lifecycle
+    this.lifecycle.forEach( lifecycle => {
+      this.applyToElement(`#lifecycle_${lifecycle}`, e => {
+        e.classList.add("lifecycle");
+      });
+    });
+
+    // conflict cards
+    this.conflict_cards.forEach( conflict_card => {
+      this.applyToElement(`#conflict_card_${conflict_card}`, e => {
+        e.classList.add("conflict_card");
+      });
+    });
   }
 
   private renderGame(game: Game) {

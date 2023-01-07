@@ -79,4 +79,18 @@ svg {
       fill-opacity: 0.1;
     }
   }
+
+  .lifecycle {
+    stroke: #e7e7e7;
+    stroke-width: 1px;
+    stroke-linecap: round;
+
+    &:not(.active) {
+      stroke-opacity: 0;
+    }
+  }
+
+  .conflict_card {
+    opacity: 0;
+  }
 }

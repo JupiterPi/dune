@@ -26,6 +26,13 @@ class Game {
 
     fun drawIntrigueCard(): IntrigueCard = intrigueCardStack.removeFirst()
 
+    init {
+        //TODO tmp
+        repeat(4) {
+            intrigueCardStack.addAll(intrigueCardStack)
+        }
+    }
+
     // allies
 
     val allies = mutableMapOf<Faction, Player?>(

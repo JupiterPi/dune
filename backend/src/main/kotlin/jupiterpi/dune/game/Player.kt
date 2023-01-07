@@ -40,6 +40,7 @@ class Player(
     var discardedCards = mutableListOf<AgentCard>()
 
     init {
+        //TODO tmp
         drawCardsFromDeck(5)
     }
 
@@ -71,6 +72,11 @@ class Player(
         repeat(amount) {
             intrigueCards.add(game.drawIntrigueCard())
         }
+    }
+
+    init {
+        //TODO tmp
+        drawIntrigueCards(6)
     }
 
     // influence

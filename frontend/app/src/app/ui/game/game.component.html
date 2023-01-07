@@ -1,47 +1,71 @@
 <div id="container">
-  <div>
-    <app-board></app-board>
+
+  <div class="horiz-flex">
+    <div>
+      <app-board></app-board>
+    </div>
+
+    <div *ngIf="game">
+
+      <div id="players">
+        <div class="player" *ngFor="let player of game.players">
+          <b>{{player.name}}</b>
+          <br>
+          Leader: <b>{{player.leader.name}}</b>
+          <br>
+          Solari: <b>{{player.solari}}</b>, Spice: <b>{{player.spice}}</b>, Water: <b>{{player.water}}</b>
+          <br>
+          Military Strength: <b>{{player.militaryStrength}}</b>, Victory Points: <b>{{player.victoryPoints}}</b>
+          <br>
+          Influence:
+          Imperator <b>{{player.influenceLevels.IMPERATOR}}</b> <ng-container *ngIf="game.allies.IMPERATOR === player.name"><b><i> (allied)</i></b></ng-container>,
+          Spacing Guild <b>{{player.influenceLevels.SPACING_GUILD}}</b> <ng-container *ngIf="game.allies.SPACING_GUILD === player.name"><b><i> (allied)</i></b></ng-container>,
+          Bene Gesserit <b>{{player.influenceLevels.BENE_GESSERIT}}</b> <ng-container *ngIf="game.allies.BENE_GESSERIT === player.name"><b><i> (allied)</i></b></ng-container>,
+          Fremen <b>{{player.influenceLevels.FREMEN}}</b> <ng-container *ngIf="game.allies.FREMEN === player.name"><b><i> (allied)</i></b></ng-container>
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="playerGame" id="player-game">
+
+      <div>
+        <b>Hand</b>:
+        <br>
+        <ng-container *ngFor="let card of playerGame.hand">
+          {{card.title}} <br>
+        </ng-container>
+      </div>
+
+      <div>
+        <b>Intrigue Cards</b>:
+        <br>
+        <ng-container *ngFor="let intrigueCard of playerGame.intrigueCards">
+          {{intrigueCard.title}} <br>
+        </ng-container>
+      </div>
+
+    </div>
   </div>
 
-  <div *ngIf="game">
-
-    <div id="players">
-      <div class="player" *ngFor="let player of game.players">
-        <b>{{player.name}}</b>
-        <br>
-        Leader: <b>{{player.leader.name}}</b>
-        <br>
-        Solari: <b>{{player.solari}}</b>, Spice: <b>{{player.spice}}</b>, Water: <b>{{player.water}}</b>
-        <br>
-        Military Strength: <b>{{player.militaryStrength}}</b>, Victory Points: <b>{{player.victoryPoints}}</b>
-        <br>
-        Influence:
-        Imperator <b>{{player.influenceLevels.IMPERATOR}}</b> <ng-container *ngIf="game.allies.IMPERATOR === player.name"><b><i> (allied)</i></b></ng-container>,
-        Spacing Guild <b>{{player.influenceLevels.SPACING_GUILD}}</b> <ng-container *ngIf="game.allies.SPACING_GUILD === player.name"><b><i> (allied)</i></b></ng-container>,
-        Bene Gesserit <b>{{player.influenceLevels.BENE_GESSERIT}}</b> <ng-container *ngIf="game.allies.BENE_GESSERIT === player.name"><b><i> (allied)</i></b></ng-container>,
-        Fremen <b>{{player.influenceLevels.FREMEN}}</b> <ng-container *ngIf="game.allies.FREMEN === player.name"><b><i> (allied)</i></b></ng-container>
+  <div *ngIf="playerGame">
+    <b>Hand:</b><br>
+    <div id="hand-cards" class="cards-container">
+      <div *ngFor="let card of playerGame.hand">
+        {{card.title}} <br>
+        <div class="card-img"><img [src]="'/assets/agent_cards/' + card.id + '.jpg'" [alt]="card.title"></div>
       </div>
     </div>
-
   </div>
 
-  <div *ngIf="playerGame" id="player-game">
-
-    <div>
-      <b>Hand</b>:
-      <br>
-      <ng-container *ngFor="let card of playerGame.hand">
-        {{card.title}} <br>
-      </ng-container>
-    </div>
-
-    <div>
-      <b>Intrigue Cards</b>:
-      <br>
-      <ng-container *ngFor="let intrigueCard of playerGame.intrigueCards">
+  <div *ngIf="playerGame">
+    <b>Intrigue Cards:</b><br>
+    <div id="intrigue-cards" class="cards-container">
+      <div *ngFor="let intrigueCard of playerGame.intrigueCards">
         {{intrigueCard.title}} <br>
-      </ng-container>
+        <div class="card-img"><img [src]="'/assets/intrigue_cards/' + intrigueCard.id + '.jpg'"></div>
+      </div>
     </div>
-
   </div>
+
 </div>

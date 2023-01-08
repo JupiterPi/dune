@@ -27,9 +27,7 @@ enum class IntrigueCard(
 
 
     AMBUSH(
-        "Ambush", 2, listOf(Type.FIGHT), { player ->
-            //TODO grant 4 military strength
-        }
+        "Ambush", 2, listOf(Type.FIGHT), { player -> player.additionalMilitaryStrength += 4 }
     ),
     // ...
 
@@ -45,7 +43,16 @@ enum class IntrigueCard(
 
     SKIM_MARKET(
         "Skim The Market", 1, listOf(Type.FINALE), { player ->
-            //TODO (see card)
+            val totalCards = mutableMapOf<Player, MutableList<AgentCard>>()
+            player.game.players.forEach {
+                totalCards[it] = mutableListOf()
+                totalCards[it]!!.addAll(player.deck)
+                totalCards[it]!!.addAll(player.hand)
+                totalCards[it]!!.addAll(player.discardedCards)
+            }
+            val amounts = totalCards.mapValues { it.value.count { it === AgentCard.THE_SPICE_MUST_FLOW } }
+            if (amounts[player]!! >= 1) player.victoryPoints += 1
+            if (amounts[player]!! > amounts.toMutableMap().apply { remove(player) }.maxOf { it.value } ) player.victoryPoints += 1
         }
     );
     // ...

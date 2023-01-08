@@ -14,16 +14,40 @@ class Player(
     }
 
     // basic resources
+    //TODO add checks for max
 
     var solari = 0
     var spice = 0
     var water = 0
 
+    var victoryPoints = 1
+
+    var agentsLeft = 0
     var totalAgents = 2
-    var troopsInGarrison = 0
 
     var convictionPoints = 0
-    var victoryPoints = 1
+
+    //TODO correctly implement whether troops can be placed into conflict (-> Leader.HARKONNEN_BEAST)
+    var troopsInConflict = 0
+    var additionalMilitaryStrength = 0
+    var troopsInGarrison = 0
+    val totalMilitaryStrength get() = if (troopsInConflict > 0) troopsInConflict * 2 + additionalMilitaryStrength else 0
+
+    fun resetPerRoundResources() {
+        agentsLeft = totalAgents
+        troopsInConflict = 0
+        additionalMilitaryStrength = 0
+        convictionPoints = 0
+    }
+
+    // troops
+    fun optionallyPlaceTroopsIntoConflict(amountFromGarrison: Int, amountExtra: Int = 0) {
+        troopsInGarrison -= amountFromGarrison
+        val amount = amountFromGarrison + amountExtra
+        val chosenAmount = game.handler.requestOptionallyPlaceTroopsIntoConflict(this, amount)
+        troopsInGarrison += amount - chosenAmount
+        troopsInConflict += chosenAmount
+    }
 
     // deck
 
@@ -90,7 +114,14 @@ class Player(
 
     fun getInfluenceLevel(faction: Faction) = influenceLevels[faction] ?: 0
 
-    fun raiseInfluenceLevel(faction: Faction, raiseBy: Int) = setInfluenceLevel(faction, getInfluenceLevel(faction) + raiseBy)
+    fun raiseInfluenceLevel(faction: Faction, raiseBy: Int) {
+        setInfluenceLevel(faction, getInfluenceLevel(faction) + raiseBy)
+    }
+
+    fun raiseInfluenceLevelWithAny(raiseBy: Int) {
+        val faction = game.handler.requestInfluenceWithAny(this)
+        raiseInfluenceLevel(faction, raiseBy)
+    }
 
     fun setInfluenceLevel(faction: Faction, influenceLevel: Int) {
         val formerInfluenceLevel = getInfluenceLevel(faction)
@@ -117,8 +148,9 @@ enum class Leader(
 ) {
     ATREIDES_PAUL("Paul Atreides", { player -> player.drawCardsFromDeck(1) }),
     HARKONNEN_BEAST("Glossu \"Beast\" Rabban", { player ->
-        //TODO check for faction alliance -> grants 2 instead
         player.troopsInGarrison += 1
+        if (player.game.allies.count { it.value === player } >= 1) player.troopsInGarrison += 1
+        //TODO check if they can be placed into conflict (see also TODO in Player)
     }),
     THORVALD_MEMNO("Count Memnon Thorvald", { player -> player.spice += 1 }),
     RICHESE_ILBAN("Count Ilban Richese", { player -> player.solari += 1 }),

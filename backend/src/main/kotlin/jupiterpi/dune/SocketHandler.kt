@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
+import java.lang.Exception
 import java.util.*
 
 class SocketHandler(
@@ -25,6 +26,15 @@ class SocketHandler(
         }
     }
 
+    override fun requestSimpleChoice(player: Player, choices: List<String>, min: Int, max: Int): List<Int> {
+        data class Payload(val options: List<String>, val min: Int, val max: Int)
+
+        val results = request(player, UserRequest("SIMPLE_CHOICE", Payload(choices, min, max))).content
+            .split(",").map { it.toInt() }
+        if (results.size !in min..max) throw Exception("Amount of results $results are not in range of $min..$max")
+        return results
+    }
+
     override fun requestPlayerActionType(player: Player): Game.PlayerActionType
     = Game.PlayerActionType.valueOf(
         request(player, UserRequest("PLAYER_ACTION_TYPE")).content
@@ -38,6 +48,26 @@ class SocketHandler(
     override fun requestAgentAction(player: Player): AgentAction
     = AgentAction.valueOf(
         request(player, UserRequest("AGENT_ACTION")).content
+    )
+
+    override fun requestOptionallyPlaceTroopsIntoConflict(player: Player, amount: Int): Int {
+        data class Payload(val amount: Int)
+        return request(player, UserRequest("OPTIONALLY_PLACE_TROOPS", Payload(amount))).content.toInt()
+    }
+
+    override fun requestSellSpiceAmount(player: Player, maxAmount: Int): Int {
+        data class Payload(val maxAmount: Int)
+        return request(player, UserRequest("SELL_SPICE_AMOUNT", Payload(maxAmount))).content.toInt()
+    }
+
+    override fun requestDestroyCardFromHand(player: Player): AgentCard
+    = AgentCard.valueOf(
+        request(player, UserRequest("DESTROY_CARD")).content
+    )
+
+    override fun requestInfluenceWithAny(player: Player): Faction
+    = Faction.valueOf(
+        request(player, UserRequest("INFLUENCE_WITH_ANY")).content
     )
 
     private val responses = mutableMapOf<String, UserResponse>()
@@ -65,7 +95,7 @@ class SocketHandler(
 
 data class UserRequest(
     val type: String,
-    val content: String? = null,
+    val payload: Any? = null,
 ) {
     val id = UUID.randomUUID().toString()
 }

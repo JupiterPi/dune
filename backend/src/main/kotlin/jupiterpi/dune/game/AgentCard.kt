@@ -16,9 +16,7 @@ enum class AgentCard(
     DAGGER(
         "Dagger", 0, 0,
         listOf(AgentSymbol.LANDSRAAD),
-        {}, { player ->
-            //TODO grant 1 military strength
-        }
+        {}, { player -> player.additionalMilitaryStrength += 1 }
     ),
     DIPLOMACY(
         "Diplomacy", 0, 0,
@@ -54,5 +52,9 @@ enum class AgentCard(
             player.drawCardsFromDeck(1)
             player.destroyCardFromHand(FOLD_SPACE)
         }, {}
+    ),
+    //TODO dummy for the sake of IntrigueCard.SKIM_MARKET
+    THE_SPICE_MUST_FLOW(
+        "The Spice Must Flow", 0, 0, listOf(), {}, {}
     )
 }

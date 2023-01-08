@@ -3,7 +3,7 @@ package jupiterpi.dune.game
 import jupiterpi.dune.Handler
 
 class Game(
-    private val handler: Handler
+    val handler: Handler
 ) {
     val players = mutableListOf<Player>()
 
@@ -141,7 +141,7 @@ class Game(
 
                             val agentCard = handler.requestAgentCard(player)
                             val agentAction = handler.requestAgentAction(player)
-                            if (agentAction.isUsableForPlayer(player)) {
+                            if (agentAction.isUsableForPlayer(player, agentCard.agentSymbols)) {
                                 agentAction.useForPlayer(player)
                                 //TODO block card
                             }

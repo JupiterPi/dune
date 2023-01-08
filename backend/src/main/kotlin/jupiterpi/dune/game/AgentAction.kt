@@ -27,7 +27,7 @@ enum class AgentAction(
         "Heighliner", AgentSymbol.SPACING_GUILD, Faction.SPACING_GUILD,
         { player -> player.spice >= 6 }, true, { player ->
             player.spice -= 6
-            player.troopsInGarrison += 5 //TODO troops could also be placed in conflict pool
+            player.optionallyPlaceTroopsIntoConflict(2, amountExtra = 5)
             player.water += 2
         }
     ),
@@ -43,7 +43,7 @@ enum class AgentAction(
         "Selective Breeding", AgentSymbol.BENE_GESSERIT, Faction.BENE_GESSERIT,
         { player -> player.spice >= 2 }, false, { player ->
             player.spice -= 2
-            //TODO remove one card
+            player.destroyCardFromHand(player.game.handler.requestDestroyCardFromHand(player))
             player.drawCardsFromDeck(2)
         }
     ),
@@ -66,7 +66,7 @@ enum class AgentAction(
         "Tough Warriors", AgentSymbol.FREMEN, Faction.FREMEN,
         { player -> player.water >= 1 }, true, { player ->
             player.water -= 1
-            player.troopsInGarrison += 2 //TODO troops could also be placed in conflict pool
+            player.optionallyPlaceTroopsIntoConflict(2, amountExtra = 2)
         }
     ),
     STILLSUIT(
@@ -96,7 +96,7 @@ enum class AgentAction(
         { player -> player.solari >= 2 }, false, { player ->
             player.solari -= 2
             player.drawCardsFromDeck(1)
-            //TODO grant mentat
+            player.agentsLeft += 1
         }
     ),
     COLLECT_TROOPS(
@@ -110,7 +110,8 @@ enum class AgentAction(
         "Sword Master", AgentSymbol.LANDSRAAD, null,
         { player -> player.solari >= 8 }, false, { player ->
             player.solari -= 8
-            //TODO grant 3rd agent
+            player.totalAgents += 1
+            player.agentsLeft += 1
         }
     ),
 
@@ -120,7 +121,7 @@ enum class AgentAction(
         { player ->
             player.getInfluenceLevel(Faction.FREMEN) >= 2
         }, true, { player ->
-            player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
+            player.optionallyPlaceTroopsIntoConflict(2, amountExtra = 1)
             player.water += 1
         }
     ),
@@ -134,7 +135,7 @@ enum class AgentAction(
     CARTHAG(
         "Carthag", AgentSymbol.CITY, null,
         { player -> true }, true, { player ->
-            player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
+            player.optionallyPlaceTroopsIntoConflict(2, amountExtra = 1)
             player.drawIntrigueCards(1)
             player.game.grantControlBonus(AgentActionControl.CARTHAG)
         }
@@ -142,7 +143,7 @@ enum class AgentAction(
     ARRAKEEN(
         "Arrakeen", AgentSymbol.CITY, null,
         { player -> true }, true, { player ->
-            player.troopsInGarrison += 1 //TODO troops could also be placed in conflict pool
+            player.optionallyPlaceTroopsIntoConflict(2, amountExtra = 1)
             player.drawCardsFromDeck(1)
             player.game.grantControlBonus(AgentActionControl.ARRAKEEN)
         }
@@ -169,16 +170,21 @@ enum class AgentAction(
         "Imperial Basin", AgentSymbol.SPICE, null,
         { player -> true }, true, { player ->
             player.spice += 1
-            //TODO grant additional aggregated spice
             player.spice += player.game.consumeAggregatedSpice(IMPERIAL_BASIN)
         }
     ),
     SELL_SPICE(
         "Sell Spice", AgentSymbol.SPICE, null,
-        //TODO better system to handle multiple options
         { player -> player.spice >= 2 }, false, { player ->
-            player.spice -= 2 //TODO handle multiple options
-            player.solari += 6
+            val amount = player.game.handler.requestSellSpiceAmount(player, kotlin.math.min(player.spice, 5)).coerceIn(2..5)
+            player.spice -= amount
+            player.solari += when (amount) {
+                2 -> 6
+                3 -> 8
+                4 -> 10
+                5 -> 12
+                else -> 0
+            }
         }
     ),
     MAKE_DEAL(
@@ -186,9 +192,8 @@ enum class AgentAction(
         { player -> true }, false, { player -> player.solari += 3 }
     );
 
-    fun isUsableForPlayer(player: Player): Boolean {
-        //TODO check if agent symbol available
-        return this.usableForPlayer(player)
+    fun isUsableForPlayer(player: Player, agentSymbolsAvailable: List<AgentSymbol>): Boolean {
+        return agentSymbolsAvailable.contains(this.symbol) and this.usableForPlayer(player)
     }
 
     fun useForPlayer(player: Player) {

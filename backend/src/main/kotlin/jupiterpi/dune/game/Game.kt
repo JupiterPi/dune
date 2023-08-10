@@ -21,6 +21,7 @@ class Game(
 
     private fun drawNextConflictCard() {
         activeConflictCard = conflictCardStack.removeFirst()
+        activeConflictCard.grantImmediateEffects(this)
     }
 
     // intrigue cards
@@ -133,13 +134,21 @@ class Game(
             val activePlayers = players.toMutableList()
             while (activePlayers.isNotEmpty()) {
                 val playersToRemove = mutableListOf<Player>()
-                players.forEach { player ->
+                activePlayers.forEach { player ->
 
-                    //TODO check if agent left
-                    when (handler.requestPlayerActionType(player)) {
+                    val playerActionType: PlayerActionType = if (player.agentsLeft > 0) {
+                        handler.requestPlayerActionType(player)
+                    } else {
+                        PlayerActionType.UNCOVER_ACTION
+                    }
+                    when (playerActionType) {
                         PlayerActionType.AGENT_ACTION -> {
 
                             val agentCard = handler.requestAgentCard(player)
+                            player.agentsLeft -= 1
+                            player.discardCardFromHand(agentCard)
+                            player.cardsPlayedThisRound.add(agentCard)
+
                             val agentAction = handler.requestAgentAction(player)
                             if (agentAction.isUsableForPlayer(player, agentCard.agentSymbols)) {
                                 agentAction.useForPlayer(player)
@@ -152,7 +161,8 @@ class Game(
                             player.hand.forEach {
                                 it.uncoverEffect(player)
                             }
-                            //TODO ...
+                            player.cardsPlayedThisRound.addAll(player.hand)
+                            player.discardHand()
                             playersToRemove.add(player)
 
                         }

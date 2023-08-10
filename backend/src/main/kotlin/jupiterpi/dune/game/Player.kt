@@ -61,6 +61,7 @@ class Player(
         AgentCard.SIGNET_RING,
     )
     var hand = mutableListOf<AgentCard>()
+    var cardsPlayedThisRound = mutableListOf<AgentCard>()
     var discardedCards = mutableListOf<AgentCard>()
 
     init {
@@ -82,6 +83,19 @@ class Player(
 
     fun drawCardsFromDeck(amount: Int) {
         hand.addAll(consumeFromDeck(amount))
+    }
+
+    fun discardCardFromHand(card: AgentCard) {
+        hand.remove(card)
+        discardedCards.add(card)
+    }
+    fun discardHand() {
+        discardedCards.addAll(hand)
+        hand.clear()
+    }
+
+    fun discardPlayedCards() {
+        cardsPlayedThisRound.clear()
     }
 
     fun destroyCardFromHand(card: AgentCard) {

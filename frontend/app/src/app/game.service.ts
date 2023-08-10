@@ -91,10 +91,10 @@ export class GameService {
   });
 
   constructor(private socket: SocketService) {
-    this.socket.onMessage("/topic/game").subscribe(game => {
+    this.socket.onMessage("game").subscribe(game => {
       this.game.next(game as Game);
     });
-    this.socket.onMessage("/topic/player/Player1/game").subscribe(playerGame => {
+    this.socket.onMessage("playerGame").subscribe(playerGame => {
       this.playerGame.next(playerGame as PlayerGame);
     });
   }

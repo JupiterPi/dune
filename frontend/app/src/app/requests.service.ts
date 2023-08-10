@@ -20,7 +20,7 @@ export class RequestsService {
   private requests: Subject<Request> = new Subject<Request>();
 
   constructor(private socket: SocketService) {
-    this.socket.onMessage("/topic/player/Player1/requests").subscribe(request => {
+    this.socket.onMessage("request").subscribe(request => {
       this.requests.next(request as Request);
     });
   }
@@ -36,6 +36,6 @@ export class RequestsService {
     return this.requests;
   }
   sendResponse(response: Response) {
-    this.socket.sendMessage("/topic/player/requests", response);
+    this.socket.sendMessage("request", response);
   }
 }

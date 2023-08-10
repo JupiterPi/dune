@@ -1,6 +1,5 @@
 import {Component, ElementRef, Inject, OnInit} from '@angular/core';
 import {Game, GameService} from "../../game.service";
-import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
 
 @Component({
   selector: 'app-board',
@@ -8,66 +7,6 @@ import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements OnInit {
-  /*state: Game = {
-    players: [
-      {
-        name: "Player 1",
-        color: "#F26968",
-        leader: {
-          id: "ATREIDES_PAUL",
-          name: "Paul Atreides",
-        },
-        solari: 1,
-        spice: 1,
-        water: 1,
-        militaryStrength: 0,
-        victoryPoints: 1,
-        influenceLevels: {
-          IMPERATOR: 0,
-          SPACING_GUILD: 1,
-          BENE_GESSERIT: 2,
-          FREMEN: 3,
-        },
-      },
-      {
-        name: "Player 2",
-        color: "#75AFD4",
-        leader: {
-          id: "HARKONNEN_BEAST",
-          name: "Glossu \"Beast\" Harkonnen",
-        },
-        solari: 1,
-        spice: 1,
-        water: 1,
-        militaryStrength: 1,
-        victoryPoints: 1,
-        influenceLevels: {
-          IMPERATOR: 0,
-          SPACING_GUILD: 2,
-          BENE_GESSERIT: 4,
-          FREMEN: 6,
-        },
-      },
-    ],
-    allies: {
-      IMPERATOR: undefined,
-      SPACING_GUILD: undefined,
-      BENE_GESSERIT: undefined,
-      FREMEN: undefined,
-    },
-    control: {
-      ARRAKEEN: "Player 1",
-      CARTHAG: "Player 2",
-      IMPERIAL_BASIN: undefined,
-    },
-    highCouncilMembers: ["Player 2"],
-    aggregatedSpice: {
-      GREAT_PLAIN: 0,
-      HAGGA_BASIN: 1,
-      IMPERIAL_BASIN: 2,
-    }
-  }*/
-
   constructor(@Inject(ElementRef) private elementRef: ElementRef, private game: GameService) {}
 
   ngOnInit(): void {

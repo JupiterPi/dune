@@ -1,11 +1,15 @@
 package jupiterpi.dune.game
 
+import jupiterpi.dune.PlayerConnection
+
 class Player(
-    val game: Game,
     val name: String,
     val color: Color,
     val leader: Leader,
+    val connection: PlayerConnection,
 ) {
+    lateinit var game: Game
+
     enum class Color(val rgb: Int) {
         RED(0xF23838),
         GREEN(0x33A650),
@@ -41,10 +45,10 @@ class Player(
     }
 
     // troops
-    fun optionallyPlaceTroopsIntoConflict(amountFromGarrison: Int, amountExtra: Int = 0) {
+    suspend fun optionallyPlaceTroopsIntoConflict(amountFromGarrison: Int, amountExtra: Int = 0) {
         troopsInGarrison -= amountFromGarrison
         val amount = amountFromGarrison + amountExtra
-        val chosenAmount = game.handler.requestOptionallyPlaceTroopsIntoConflict(this, amount)
+        val chosenAmount = connection.requestOptionallyPlaceTroopsIntoConflict(amount)
         troopsInGarrison += amount - chosenAmount
         troopsInConflict += chosenAmount
     }
@@ -132,8 +136,8 @@ class Player(
         setInfluenceLevel(faction, getInfluenceLevel(faction) + raiseBy)
     }
 
-    fun raiseInfluenceLevelWithAny(raiseBy: Int) {
-        val faction = game.handler.requestInfluenceWithAny(this)
+    suspend fun raiseInfluenceLevelWithAny(raiseBy: Int) {
+        val faction = connection.requestInfluenceWithAny()
         raiseInfluenceLevel(faction, raiseBy)
     }
 

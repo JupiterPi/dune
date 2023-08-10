@@ -6,7 +6,7 @@ enum class AgentAction(
     val faction: Faction?,
     private val usableForPlayer: (player: Player) -> Boolean,
     val conflictAction: Boolean,
-    private val applyEffectForPlayer: (player: Player) -> Unit,
+    private val applyEffectForPlayer: suspend (player: Player) -> Unit,
 ) {
     CONSPIRACY(
         "Conspiracy", AgentSymbol.IMPERATOR, Faction.IMPERATOR,
@@ -43,7 +43,7 @@ enum class AgentAction(
         "Selective Breeding", AgentSymbol.BENE_GESSERIT, Faction.BENE_GESSERIT,
         { player -> player.spice >= 2 }, false, { player ->
             player.spice -= 2
-            player.destroyCardFromHand(player.game.handler.requestDestroyCardFromHand(player))
+            player.destroyCardFromHand(player.connection.requestDestroyCardFromHand())
             player.drawCardsFromDeck(2)
         }
     ),
@@ -176,7 +176,7 @@ enum class AgentAction(
     SELL_SPICE(
         "Sell Spice", AgentSymbol.SPICE, null,
         { player -> player.spice >= 2 }, false, { player ->
-            val amount = player.game.handler.requestSellSpiceAmount(player, kotlin.math.min(player.spice, 5)).coerceIn(2..5)
+            val amount = player.connection.requestSellSpiceAmount(kotlin.math.min(player.spice, 5)).coerceIn(2..5)
             player.spice -= amount
             player.solari += when (amount) {
                 2 -> 6
@@ -196,7 +196,7 @@ enum class AgentAction(
         return agentSymbolsAvailable.contains(this.symbol) and this.usableForPlayer(player)
     }
 
-    fun useForPlayer(player: Player) {
+    suspend fun useForPlayer(player: Player) {
         player.game.blockAgentAction(this)
         applyEffectForPlayer(player)
         //TODO players can choose to play troops on conflict actions

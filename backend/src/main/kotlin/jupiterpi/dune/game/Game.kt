@@ -1,11 +1,11 @@
 package jupiterpi.dune.game
 
-import jupiterpi.dune.Handler
-
 class Game(
-    val handler: Handler
+    val players: List<Player>,
 ) {
-    val players = mutableListOf<Player>()
+    init {
+        players.forEach { it.game = this }
+    }
 
     // conflict cards
 
@@ -15,7 +15,7 @@ class Game(
 
     init {
         for (level in 1..3) {
-            conflictCardStack.addAll(ConflictCard.values().filter { it.level == level }.shuffled())
+            conflictCardStack.addAll(ConflictCard.entries.filter { it.level == level }.shuffled())
         }
     }
 
@@ -26,7 +26,7 @@ class Game(
 
     // intrigue cards
 
-    private val intrigueCardStack = IntrigueCard.values().flatMap { card -> generateSequence { card }.take(card.amountInGame).toList() }.toMutableList()
+    private val intrigueCardStack = IntrigueCard.entries.flatMap { card -> generateSequence { card }.take(card.amountInGame).toList() }.toMutableList()
 
     fun drawIntrigueCard(): IntrigueCard = intrigueCardStack.removeFirst()
 
@@ -65,7 +65,7 @@ class Game(
     init { refreshAvailableAgentActions() }
     private fun refreshAvailableAgentActions() {
         availableAgentActions.clear()
-        availableAgentActions.addAll(AgentAction.values())
+        availableAgentActions.addAll(AgentAction.entries.toTypedArray())
     }
 
     fun blockAgentAction(agentAction: AgentAction) {
@@ -116,7 +116,7 @@ class Game(
     var lifecyclePhase: LifecyclePhase = LifecyclePhase.NOT_STARTED
         private set
 
-    fun run() {
+    suspend fun run() {
         while (true) {
 
             // --- ROUND_START ---
@@ -137,19 +137,19 @@ class Game(
                 activePlayers.forEach { player ->
 
                     val playerActionType: PlayerActionType = if (player.agentsLeft > 0) {
-                        handler.requestPlayerActionType(player)
+                        player.connection.requestPlayerActionType()
                     } else {
                         PlayerActionType.UNCOVER_ACTION
                     }
                     when (playerActionType) {
                         PlayerActionType.AGENT_ACTION -> {
 
-                            val agentCard = handler.requestAgentCard(player)
+                            val agentCard = player.connection.requestAgentCard()
                             player.agentsLeft -= 1
                             player.discardCardFromHand(agentCard)
                             player.cardsPlayedThisRound.add(agentCard)
 
-                            val agentAction = handler.requestAgentAction(player)
+                            val agentAction = player.connection.requestAgentAction()
                             if (agentAction.isUsableForPlayer(player, agentCard.agentSymbols)) {
                                 agentAction.useForPlayer(player)
                                 //TODO block card

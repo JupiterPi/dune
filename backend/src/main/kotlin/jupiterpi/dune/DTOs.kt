@@ -1,10 +1,9 @@
 package jupiterpi.dune
 
 import jupiterpi.dune.game.*
-import org.springframework.messaging.handler.annotation.DestinationVariable
-import org.springframework.messaging.simp.annotation.SubscribeMapping
-import org.springframework.stereotype.Controller
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class GameDTO(
     val players: List<PlayerDTO>,
     val allies: Map<String, String?>,
@@ -21,6 +20,7 @@ data class GameDTO(
     )
 }
 
+@Serializable
 data class PlayerDTO(
     val name: String,
     val color: String,
@@ -41,6 +41,7 @@ data class PlayerDTO(
     )
 }
 
+@Serializable
 data class LeaderDTO(
     val id: String,
     val name: String,
@@ -48,6 +49,7 @@ data class LeaderDTO(
     constructor(leader: Leader) : this(leader.name, leader.title)
 }
 
+@Serializable
 data class PlayerGameDTO(
     val hand: List<AgentCardDTO>,
     val intrigueCards: List<IntrigueCardDTO>,
@@ -58,6 +60,7 @@ data class PlayerGameDTO(
     )
 }
 
+@Serializable
 data class AgentCardDTO(
     val id: String,
     val title: String,
@@ -70,6 +73,7 @@ data class AgentCardDTO(
     )
 }
 
+@Serializable
 data class IntrigueCardDTO(
     val id: String,
     val title: String,

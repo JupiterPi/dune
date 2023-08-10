@@ -4,7 +4,7 @@ enum class ConflictCard(
     val title: String,
     val level: Int,
     val grantImmediateEffects: (game: Game) -> Unit,
-    val grantRewards: (first: Player, second: Player, third: Player) -> Unit,
+    val grantRewards: suspend (first: Player, second: Player, third: Player) -> Unit,
 ) {
     I_FIGHT_1("Fight (I)", 1, {}, { first, second, third ->
         first.raiseInfluenceLevelWithAny(1)
@@ -55,7 +55,7 @@ enum class ConflictCard(
         first.drawIntrigueCards(2)
         second.drawIntrigueCards(1)
         second.spice += 1
-        when (third.game.handler.requestSimpleChoice(third, listOf(
+        when (third.connection.requestSimpleChoice(listOf(
             "1 Intrigue Card",
             "1 Spice",
         ), 1, 1)[0]) {
@@ -64,7 +64,7 @@ enum class ConflictCard(
         }
     }),
     II_DARK_DOINGS("Dark Doings (II)", 2, {}, { first, second, third ->
-        first.game.handler.requestSimpleChoice(first, listOf(
+        first.connection.requestSimpleChoice(listOf(
             "1 Influence with Imperator",
             "1 Influence with Spacing Guild",
             "1 Influence with Bene Gesserit",
@@ -89,7 +89,7 @@ enum class ConflictCard(
     }),
     II_GRUESOME_INTENTIONS("Gruesome Intentions (II)", 2, {}, { first, second, third ->
         first.victoryPoints += 1
-        first.destroyCardFromHand(first.game.handler.requestDestroyCardFromHand(first))
+        first.destroyCardFromHand(first.connection.requestDestroyCardFromHand())
         second.water += 1
         second.spice += 1
         third.spice += 1
@@ -138,7 +138,7 @@ enum class ConflictCard(
         first.victoryPoints += 2
         first.game.control[AgentActionControl.ARRAKEEN] = first
         second.let { player ->
-            player.game.handler.requestSimpleChoice(second, listOf(
+            player.connection.requestSimpleChoice(listOf(
                 "1 Intrigue Card",
                 "2 Spice",
                 "3 Solari",

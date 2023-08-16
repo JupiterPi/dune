@@ -1,5 +1,7 @@
 package jupiterpi.dune.game
 
+import jupiterpi.dune.game.enums.*
+
 class Game(
     val players: List<Player>,
 ) {
@@ -11,15 +13,14 @@ class Game(
 
     private val conflictCardStack = mutableListOf<ConflictCard>()
     lateinit var activeConflictCard: ConflictCard
-        private set
 
     init {
-        for (level in 1..3) {
-            conflictCardStack.addAll(ConflictCard.entries.filter { it.level == level }.shuffled())
+        mapOf(1 to 1, 2 to 5, 3 to 4).forEach { (level, n) ->
+            conflictCardStack += ConflictCard.entries.filter { it.level == level }.shuffled().take(n)
         }
     }
 
-    private fun drawNextConflictCard() {
+    fun drawNextConflictCard() {
         activeConflictCard = conflictCardStack.removeFirst()
         activeConflictCard.grantImmediateEffects(this)
     }
@@ -28,7 +29,7 @@ class Game(
 
     private val intrigueCardStack = IntrigueCard.entries.flatMap { card -> generateSequence { card }.take(card.amountInGame).toList() }.toMutableList()
 
-    fun drawIntrigueCard(): IntrigueCard = intrigueCardStack.removeFirst()
+    fun drawIntrigueCard() = intrigueCardStack.removeFirst()
 
     init {
         //TODO tmp
@@ -62,22 +63,21 @@ class Game(
 
     val availableAgentActions = mutableSetOf<AgentAction>()
 
-    init { refreshAvailableAgentActions() }
-    private fun refreshAvailableAgentActions() {
+    fun refreshAvailableAgentActions() {
         availableAgentActions.clear()
         availableAgentActions.addAll(AgentAction.entries.toTypedArray())
     }
 
     fun blockAgentAction(agentAction: AgentAction) {
-        availableAgentActions.remove(agentAction)
+        availableAgentActions -= agentAction
     }
 
     // agent actions: high council
 
     val highCouncilMembers = mutableSetOf<Player>()
 
-    fun grantHighCouncilBenefits() {
-        highCouncilMembers.forEach { it.convictionPoints += 2 }
+    fun conditionallyGrantHighCouncilBenefits(player: Player) {
+        if (player in highCouncilMembers) player.convictionPoints += 2
     }
 
     // agent actions: aggregated spice
@@ -111,80 +111,40 @@ class Game(
         return spice
     }
 
+    // market
+
+    val market = mutableListOf<AgentCard>()
+
+    fun consumeFromMarket(card: AgentCard) {
+        market -= card
+        //TODO tmp
+        market += AgentCard.entries.random()
+    }
+
     // ----- run -----
 
     var lifecyclePhase: LifecyclePhase = LifecyclePhase.NOT_STARTED
         private set
 
     suspend fun run() {
-        while (true) {
 
-            // --- ROUND_START ---
-            lifecyclePhase = LifecyclePhase.ROUND_START
+        lifecyclePhase = LifecyclePhase.ROUND_START
+        run_roundStart()
 
-            drawNextConflictCard()
+        lifecyclePhase = LifecyclePhase.PLAYERS
+        run_players()
 
-            players.forEach {
-                it.drawCardsFromDeck(5)
-            }
+        lifecyclePhase = LifecyclePhase.CONFLICT
+        run_conflict()
 
-            // --- PLAYERS ---
-            lifecyclePhase = LifecyclePhase.PLAYERS
+        lifecyclePhase = LifecyclePhase.SANDWORMS
+        aggregateSpice()
 
-            val activePlayers = players.toMutableList()
-            while (activePlayers.isNotEmpty()) {
-                val playersToRemove = mutableListOf<Player>()
-                activePlayers.forEach { player ->
-
-                    val playerActionType: PlayerActionType = if (player.agentsLeft > 0) {
-                        player.connection.requestPlayerActionType()
-                    } else {
-                        PlayerActionType.UNCOVER_ACTION
-                    }
-                    when (playerActionType) {
-                        PlayerActionType.AGENT_ACTION -> {
-
-                            val agentCard = player.connection.requestAgentCard()
-                            player.agentsLeft -= 1
-                            player.discardCardFromHand(agentCard)
-                            player.cardsPlayedThisRound.add(agentCard)
-
-                            val agentAction = player.connection.requestAgentAction()
-                            if (agentAction.isUsableForPlayer(player, agentCard.agentSymbols)) {
-                                agentAction.useForPlayer(player)
-                                //TODO block card
-                            }
-
-                        }
-                        PlayerActionType.UNCOVER_ACTION -> {
-
-                            player.hand.forEach {
-                                it.uncoverEffect(player)
-                            }
-                            player.cardsPlayedThisRound.addAll(player.hand)
-                            player.discardHand()
-                            playersToRemove.add(player)
-
-                        }
-                    }
-
-                }
-                activePlayers.removeAll(playersToRemove)
-            }
-
-            // --- CONFLICT ---
-            lifecyclePhase = LifecyclePhase.CONFLICT
-            //TODO ...
-
-            // --- SANDWORMS ---
-            lifecyclePhase = LifecyclePhase.SANDWORMS
-            aggregateSpice()
-
-            // --- RECALL ---
-            lifecyclePhase = LifecyclePhase.RECALL
-            //TODO ...
-
+        if (players.any { it.victoryPoints >= 10 }) {
+            lifecyclePhase = LifecyclePhase.FINALE
+            run_finale()
         }
+
     }
 
     enum class LifecyclePhase(
@@ -195,10 +155,10 @@ class Game(
         PLAYERS("Players' Turns"),
         CONFLICT("Conflict"),
         SANDWORMS("Sandworms"),
-        RECALL("Recall"),
+        FINALE("Finale"),
     }
 
     enum class PlayerActionType {
-        AGENT_ACTION, UNCOVER_ACTION
+        PLOT_INTRIGUE_CARD, AGENT_ACTION, UNCOVER_ACTION
     }
 }

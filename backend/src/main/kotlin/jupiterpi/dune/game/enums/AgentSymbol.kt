@@ -1,4 +1,4 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
 
 enum class AgentSymbol(
     val title: String,

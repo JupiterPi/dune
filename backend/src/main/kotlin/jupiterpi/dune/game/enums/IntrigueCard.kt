@@ -1,4 +1,6 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
+
+import jupiterpi.dune.game.Player
 
 enum class IntrigueCard(
     val title: String,
@@ -27,13 +29,13 @@ enum class IntrigueCard(
 
 
     AMBUSH(
-        "Ambush", 2, listOf(Type.FIGHT), { player -> player.additionalMilitaryStrength += 4 }
+        "Ambush", 2, listOf(Type.CONFLICT), { player -> player.additionalMilitaryStrength += 4 }
     ),
     // ...
 
 
     DECIDER(
-        "Decider", 1, listOf(Type.FIGHT, Type.FINALE), { player ->
+        "Decider", 1, listOf(Type.CONFLICT, Type.FINALE), { player ->
             //TODO (for fight): grant 2 military strength
             //TODO (for finale): grant 10 spice
         }
@@ -61,7 +63,7 @@ enum class IntrigueCard(
         val title: String,
     ) {
         PLOT("Plot"),
-        FIGHT("Fight"),
+        CONFLICT("Fight"),
         FINALE("Finale"),
     }
 }

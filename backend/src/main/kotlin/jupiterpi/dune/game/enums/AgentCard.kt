@@ -1,4 +1,6 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
+
+import jupiterpi.dune.game.Player
 
 enum class AgentCard(
     val title: String,
@@ -47,7 +49,7 @@ enum class AgentCard(
 
     FOLD_SPACE(
         "Fold Space", 0, 0,
-        AgentSymbol.values().toList(),
+        AgentSymbol.entries,
         { player ->
             player.drawCardsFromDeck(1)
             player.destroyCardFromHand(FOLD_SPACE)

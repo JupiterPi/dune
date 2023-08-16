@@ -1,4 +1,6 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
+
+import jupiterpi.dune.game.Player
 
 enum class AgentAction(
     val title: String,
@@ -54,8 +56,8 @@ enum class AgentAction(
             player.game.players.forEach {
                 if (player.intrigueCards.size >= 4) {
                     val card = it.intrigueCards.random()
-                    it.intrigueCards.remove(card)
-                    player.intrigueCards.add(card)
+                    it.intrigueCards -= card
+                    player.intrigueCards += card
                 }
             }
         }
@@ -81,7 +83,7 @@ enum class AgentAction(
             !player.game.highCouncilMembers.contains(player) && player.solari >= 5
         }, false, { player ->
             player.solari -= 5
-            player.game.highCouncilMembers.add(player)
+            player.game.highCouncilMembers += player
         }
     ),
     SPEAKER_HALL(

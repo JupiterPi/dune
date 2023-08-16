@@ -4,6 +4,10 @@ import io.ktor.server.websocket.*
 import io.ktor.util.reflect.*
 import io.ktor.websocket.*
 import jupiterpi.dune.game.*
+import jupiterpi.dune.game.enums.AgentAction
+import jupiterpi.dune.game.enums.AgentCard
+import jupiterpi.dune.game.enums.Faction
+import jupiterpi.dune.game.enums.IntrigueCard
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -22,7 +26,7 @@ class PlayerConnection private constructor(
         session.send("playerGame", PlayerGameDTO(player))
     }
 
-    override suspend fun requestSimpleChoice(choices: List<String>, min: Int, max: Int): List<Int> {
+    override suspend fun requestMultipleChoices(title: String, choices: List<String>, min: Int, max: Int): List<Int> {
         val results = request("SIMPLE_CHOICE", mapOf(
             "options" to choices,
             "min" to min,
@@ -32,14 +36,27 @@ class PlayerConnection private constructor(
         return results
     }
 
-    override suspend fun requestPlayerActionType(): Game.PlayerActionType
-    = Game.PlayerActionType.valueOf(request("PLAYER_ACTION_TYPE"))
+    override suspend fun requestChoice(title: String, choices: List<String>)
+    = requestMultipleChoices(title, choices, 1, 1).single()
 
-    override suspend fun requestAgentCard(): AgentCard
+    override suspend fun requestPlayerActionType(): Game.PlayerActionType
+    = requestChoice(
+        "Choose a player action",
+        listOf("Plot Intrigue Card", "Agent Action", "Uncover Action")
+    ).let { Game.PlayerActionType.entries[it] }
+
+    override suspend fun requestIntrigueCard(type: IntrigueCard.Type)
+    = IntrigueCard.valueOf(request("INTRIGUE_CARD", mapOf("type" to type)))
+
+    override suspend fun requestAgentCard()
     = AgentCard.valueOf(request("AGENT_CARD"))
 
-    override suspend fun requestAgentAction(): AgentAction
-    = AgentAction.valueOf(request("AGENT_CARD"))
+    override suspend fun requestAgentCardAndAction(available: Map<AgentCard, List<AgentAction>>)
+    = request("AGENT_CARD_AND_ACTION", available).split(",")
+        .let { AgentCard.valueOf(it[0]) to AgentAction.valueOf(it[1]) }
+
+    override suspend fun requestAgentCardFromMarket()
+    = AgentCard.valueOf(request("AGENT_CARD_FROM_MARKET"))
 
     override suspend fun requestOptionallyPlaceTroopsIntoConflict(amount: Int): Int
     = request("OPTIONALLY_PLACE_TROOPS", mapOf("amount" to amount)).toInt()

@@ -1,4 +1,7 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
+
+import jupiterpi.dune.game.Game
+import jupiterpi.dune.game.Player
 
 enum class ConflictCard(
     val title: String,
@@ -55,16 +58,16 @@ enum class ConflictCard(
         first.drawIntrigueCards(2)
         second.drawIntrigueCards(1)
         second.spice += 1
-        when (third.connection.requestSimpleChoice(listOf(
+        when (third.connection.requestChoice("Choose 1", listOf(
             "1 Intrigue Card",
             "1 Spice",
-        ), 1, 1)[0]) {
+        ))) {
             0 -> third.drawIntrigueCards(1)
             1 -> third.spice += 1
         }
     }),
     II_DARK_DOINGS("Dark Doings (II)", 2, {}, { first, second, third ->
-        first.connection.requestSimpleChoice(listOf(
+        first.connection.requestMultipleChoices("Choose 2", listOf(
             "1 Influence with Imperator",
             "1 Influence with Spacing Guild",
             "1 Influence with Bene Gesserit",
@@ -138,7 +141,7 @@ enum class ConflictCard(
         first.victoryPoints += 2
         first.game.control[AgentActionControl.ARRAKEEN] = first
         second.let { player ->
-            player.connection.requestSimpleChoice(listOf(
+            player.connection.requestMultipleChoices("Choose 2", listOf(
                 "1 Intrigue Card",
                 "2 Spice",
                 "3 Solari",

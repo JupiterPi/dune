@@ -1,4 +1,6 @@
-package jupiterpi.dune.game
+package jupiterpi.dune.game.enums
+
+import jupiterpi.dune.game.Player
 
 enum class Faction(
     val title: String,

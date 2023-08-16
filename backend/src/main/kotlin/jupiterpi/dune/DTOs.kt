@@ -1,6 +1,8 @@
 package jupiterpi.dune
 
 import jupiterpi.dune.game.*
+import jupiterpi.dune.game.enums.AgentCard
+import jupiterpi.dune.game.enums.IntrigueCard
 import kotlinx.serialization.Serializable
 
 @Serializable

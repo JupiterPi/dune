@@ -1,6 +1,9 @@
 package jupiterpi.dune.game
 
 import jupiterpi.dune.PlayerConnection
+import jupiterpi.dune.game.enums.AgentCard
+import jupiterpi.dune.game.enums.Faction
+import jupiterpi.dune.game.enums.IntrigueCard
 
 class Player(
     val name: String,
@@ -55,7 +58,7 @@ class Player(
 
     // deck
 
-    var deck = mutableListOf(
+    var deck = listOf(
         AgentCard.CONVINCING_ARGUMENT, AgentCard.CONVINCING_ARGUMENT,
         AgentCard.DAGGER, AgentCard.DAGGER,
         AgentCard.DIPLOMACY,
@@ -63,7 +66,7 @@ class Player(
         AgentCard.MILITARY_INTELLIGENCE,
         AgentCard.SEARCH_FOR_ALLIES,
         AgentCard.SIGNET_RING,
-    )
+    ).shuffled().toMutableList()
     var hand = mutableListOf<AgentCard>()
     var cardsPlayedThisRound = mutableListOf<AgentCard>()
     var discardedCards = mutableListOf<AgentCard>()
@@ -90,20 +93,23 @@ class Player(
     }
 
     fun discardCardFromHand(card: AgentCard) {
-        hand.remove(card)
-        discardedCards.add(card)
+        hand -= card
+        discardedCards += card
     }
+
+    @Deprecated("not sure why this exists")
     fun discardHand() {
         discardedCards.addAll(hand)
         hand.clear()
     }
 
+    @Deprecated("not sure why this exists")
     fun discardPlayedCards() {
         cardsPlayedThisRound.clear()
     }
 
     fun destroyCardFromHand(card: AgentCard) {
-        hand.remove(card)
+        hand -= card
     }
 
     // intrigue cards
@@ -112,7 +118,7 @@ class Player(
 
     fun drawIntrigueCards(amount: Int) {
         repeat(amount) {
-            intrigueCards.add(game.drawIntrigueCard())
+            intrigueCards += game.drawIntrigueCard()
         }
     }
 

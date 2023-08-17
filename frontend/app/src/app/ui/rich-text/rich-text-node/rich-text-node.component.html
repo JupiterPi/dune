@@ -1,0 +1,28 @@
+<ng-container [ngSwitch]="node?.type">
+
+  <ng-container *ngSwitchCase="'container'">
+    <app-rich-text-node [node]="component" *ngFor="let component of asContainer().components"></app-rich-text-node>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'text'">
+    <b *ngIf="asText().bold">{{asText().text}}</b>
+    <span *ngIf="!asText().bold">{{asText().text}}</span>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'player'">
+    <i>{{asPlayer().name}}</i>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'agent_card'">
+    <i>{{asEnumerated().id}}</i>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'agent_action'">
+    <i>{{asEnumerated().id}}</i>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'intrigue_card'">
+    <i>{{asEnumerated().id}}</i>
+  </ng-container>
+
+</ng-container>

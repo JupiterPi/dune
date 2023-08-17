@@ -71,11 +71,6 @@ class Player(
     var cardsPlayedThisRound = mutableListOf<AgentCard>()
     var discardedCards = mutableListOf<AgentCard>()
 
-    init {
-        //TODO tmp
-        drawCardsFromDeck(5)
-    }
-
     private fun consumeFromDeck(amount: Int): List<AgentCard> {
         return mutableListOf<AgentCard>().apply {
             repeat(amount) {
@@ -120,11 +115,6 @@ class Player(
         repeat(amount) {
             intrigueCards += game.drawIntrigueCard()
         }
-    }
-
-    init {
-        //TODO tmp
-        drawIntrigueCards(6)
     }
 
     // influence

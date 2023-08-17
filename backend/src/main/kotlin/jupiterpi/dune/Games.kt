@@ -2,7 +2,6 @@ package jupiterpi.dune
 
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
@@ -23,9 +22,8 @@ object Games {
         routing {
             route("games") {
                 post("create") {
-                    val configuration = call.receive<PendingGame>()
                     val id = pendingGamesId.incrementAndGet()
-                    pendingGames[id] = configuration
+                    pendingGames[id] = PendingGame()
                     call.respond(mapOf("gameId" to id))
                 }
                 webSocket("{id}/join") {

@@ -3,7 +3,8 @@ package jupiterpi.dune
 import io.ktor.server.websocket.*
 import io.ktor.util.reflect.*
 import io.ktor.websocket.*
-import jupiterpi.dune.game.*
+import jupiterpi.dune.game.Game
+import jupiterpi.dune.game.Player
 import jupiterpi.dune.game.enums.AgentAction
 import jupiterpi.dune.game.enums.AgentCard
 import jupiterpi.dune.game.enums.Faction
@@ -11,9 +12,8 @@ import jupiterpi.dune.game.enums.IntrigueCard
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.lang.Exception
 import java.nio.charset.Charset
-import java.util.UUID
+import java.util.*
 
 class PlayerConnection private constructor(
     private val session: DefaultWebSocketServerSession
@@ -75,9 +75,14 @@ class PlayerConnection private constructor(
     companion object {
         suspend fun create(session: DefaultWebSocketServerSession): PlayerConnection {
             val connection = PlayerConnection(session)
-            for (frame in session.incoming) {
-                connection.handleIncomingPacket(session.deserialize<Packet>(frame))
-            }
+            //TODO implement
+            /*coroutineScope {
+                launch {
+                    for (frame in session.incoming) {
+                        connection.handleIncomingPacket(session.deserialize<Packet>(frame))
+                    }
+                }
+            }*/
             return connection
         }
     }

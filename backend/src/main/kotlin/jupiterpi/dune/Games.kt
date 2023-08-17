@@ -38,7 +38,7 @@ object Games {
                     val id: Long by call.parameters
                     val pendingGame = pendingGames[id] ?: return@webSocket call.respondText("Game not found", status = HttpStatusCode.NotFound)
 
-                    pendingGame.players += Player(dto.name, dto.color, dto.leader, PlayerConnection.create(this))
+                    pendingGame.players += Player(dto.name, dto.color, dto.leader, PlayerConnection(this))
                 }
                 post("{id}/start") {
                     val id: Long by call.parameters

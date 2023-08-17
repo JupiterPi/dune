@@ -1,23 +1,17 @@
 package jupiterpi.dune
 
 import io.ktor.server.websocket.*
-import io.ktor.util.reflect.*
-import io.ktor.websocket.*
 import jupiterpi.dune.game.Game
 import jupiterpi.dune.game.Player
 import jupiterpi.dune.game.enums.AgentAction
 import jupiterpi.dune.game.enums.AgentCard
 import jupiterpi.dune.game.enums.Faction
 import jupiterpi.dune.game.enums.IntrigueCard
-import kotlinx.coroutines.delay
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import java.nio.charset.Charset
 import java.util.*
 
-class PlayerConnection private constructor(
-    private val session: DefaultWebSocketServerSession
-): Handler {
+class PlayerConnection(private val session: DefaultWebSocketServerSession): Handler {
     override suspend fun refreshGameState(game: Game) {
         session.send("game", GameDTO(game))
     }
@@ -72,46 +66,15 @@ class PlayerConnection private constructor(
 
     // -----
 
-    companion object {
-        suspend fun create(session: DefaultWebSocketServerSession): PlayerConnection {
-            val connection = PlayerConnection(session)
-            //TODO implement
-            /*coroutineScope {
-                launch {
-                    for (frame in session.incoming) {
-                        connection.handleIncomingPacket(session.deserialize<Packet>(frame))
-                    }
-                }
-            }*/
-            return connection
-        }
-    }
-
-    private fun handleIncomingPacket(packet: Packet) {
-        when (packet.topic) {
-            "request" -> {
-                data class UserResponse(
-                    val requestId: String,
-                    val content: String,
-                )
-                val response = packet.payload as UserResponse
-                responses[response.requestId] = response.content
-            }
-            else -> {
-                println(packet)
-            }
-        }
-    }
-
-    private val responses = mutableMapOf<String, String>()
-
     private suspend fun request(type: String, payload: Any? = null) = request(UserRequest(type, payload))
     private suspend fun request(request: UserRequest): String {
         session.send("request", request)
-        while(responses[request.id] == null) {
-            delay(10)
+        while (true) {
+            val packet = session.receiveDeserialized<Packet>()
+            val valid = packet.topic == "request" && (packet.payload as? UserResponse)?.requestId == request.id
+            if (valid) return (packet.payload as UserResponse).content
+            else error("Unhandled packet: $packet")
         }
-        return responses.remove(request.id)!!
     }
 
     @Serializable
@@ -121,10 +84,13 @@ class PlayerConnection private constructor(
     ) {
         val id = UUID.randomUUID().toString()
     }
-}
 
-suspend inline fun <reified T> WebSocketServerSession.deserialize(frame: Frame): T
-= converter?.deserialize(Charset.defaultCharset(), TypeInfo(T::class, T::class.java), frame) as T
+    @Serializable
+    data class UserResponse(
+        val requestId: String,
+        val content: String,
+    )
+}
 
 suspend fun WebSocketServerSession.send(topic: String, payload: Any) {
     sendSerialized(Packet(topic, payload))

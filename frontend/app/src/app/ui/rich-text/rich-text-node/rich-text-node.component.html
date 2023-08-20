@@ -13,8 +13,10 @@
     <i>{{asPlayer().name}}</i>
   </ng-container>
 
+  <!-- popup -->
+
   <ng-container *ngSwitchCase="'agent_card'">
-    <i>{{asEnumerated().id}}</i>
+    <span class="popup">{{asEnumerated().id}}</span>
   </ng-container>
 
   <ng-container *ngSwitchCase="'agent_action'">

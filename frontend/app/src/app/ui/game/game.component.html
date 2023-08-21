@@ -53,7 +53,7 @@
     <div id="hand-cards" class="cards-container">
       <div *ngFor="let card of playerGame.hand">
         {{card.title}} <br>
-        <div class="card-img"><img [src]="'/assets/agent_cards/' + card.id + '.jpg'" [alt]="card.title"></div>
+        <div class="card-img"><img [src]="'/assets/agent_card/' + card.id + '.jpg'" [alt]="card.title"></div>
       </div>
     </div>
   </div>
@@ -63,7 +63,7 @@
     <div id="intrigue-cards" class="cards-container">
       <div *ngFor="let intrigueCard of playerGame.intrigueCards">
         {{intrigueCard.title}} <br>
-        <div class="card-img"><img [src]="'/assets/intrigue_cards/' + intrigueCard.id + '.jpg'"></div>
+        <div class="card-img"><img [src]="'/assets/intrigue_card/' + intrigueCard.id + '.jpg'"></div>
       </div>
     </div>
   </div>

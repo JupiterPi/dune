@@ -32,4 +32,8 @@ export class RichTextNodeComponent {
   asEnumerated() {
     return this.node as EnumeratedComponent;
   }
+  enumeratedImageResource() {
+    const component = this.node as EnumeratedComponent;
+    return `/assets/${component.type}/${component.id}.jpg`;
+  }
 }

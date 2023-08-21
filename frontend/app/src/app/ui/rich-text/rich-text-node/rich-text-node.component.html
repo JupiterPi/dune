@@ -15,16 +15,19 @@
 
   <!-- popup -->
 
-  <ng-container *ngSwitchCase="'agent_card'">
-    <span class="popup">{{asEnumerated().id}}</span>
-  </ng-container>
-
-  <ng-container *ngSwitchCase="'agent_action'">
-    <i>{{asEnumerated().id}}</i>
-  </ng-container>
-
-  <ng-container *ngSwitchCase="'intrigue_card'">
-    <i>{{asEnumerated().id}}</i>
+  <!--TODO get actual titles for enumerated -->
+  <ng-container *ngSwitchDefault>
+    <div class="popup-container">
+      <div class="popup-text">
+        <img [src]="enumeratedImageResource()">
+        <span>{{asEnumerated().id}}</span>
+      </div>
+      <div class="popup-body-reference">
+        <div class="popup-body">
+          <img [src]="enumeratedImageResource()">
+        </div>
+      </div>
+    </div>
   </ng-container>
 
 </ng-container>

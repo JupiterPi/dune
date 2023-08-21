@@ -1,23 +1,38 @@
-.popup {
-  position: relative;
-}
+.popup-container {
+  display: inline-block;
 
-.popup::after {
-  content: "hello there";
-  background: grey;
-  position: absolute;
-  height: 150%;
-  width: 200px;
-  top: calc(100% + 5px);
-  left: 0;
-  cursor: default;
+  .popup-text {
+    img {
+      height: 14px;
+      border-radius: 2px;
+      margin: 0 3px;
+    }
+    text-decoration: grey underline;
+  }
 
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 200ms, visibility 200ms;
-}
+  .popup-body-reference {
+    position: relative;
+    width: 0;
+    height: 0;
 
-.popup:hover::after {
-  opacity: 1;
-  visibility: visible;
+    .popup-body {
+      position: absolute;
+      top: 5px;
+
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 200ms, opacity 200ms;
+
+      img {
+        height: 400px;
+        border-radius: 8px;
+        box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+      }
+    }
+  }
+
+  &:hover .popup-body-reference .popup-body {
+    visibility: visible;
+    opacity: 1;
+  }
 }

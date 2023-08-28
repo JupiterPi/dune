@@ -1,6 +1,7 @@
 package jupiterpi.dune.game
 
 import jupiterpi.dune.game.enums.*
+import kotlinx.coroutines.runBlocking
 
 class Game(
     val players: List<Player>,
@@ -160,5 +161,15 @@ class Game(
 
     enum class PlayerActionType {
         PLOT_INTRIGUE_CARD, AGENT_ACTION, UNCOVER_ACTION
+    }
+
+    init {
+        //TODO tmp
+        runBlocking {
+            players.forEach {
+                it.connection.refreshGameState(this@Game)
+                it.connection.refreshPlayerGameStates(it)
+            }
+        }
     }
 }

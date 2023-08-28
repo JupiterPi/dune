@@ -1,0 +1,10 @@
+<div id="container">
+
+  <button (click)="createGame()">Create Game</button>
+  <div *ngIf="gameId != undefined" id="link">
+    Share Link:
+    <input [value]="gameLink" readonly>
+    <button (click)="joinGame()">Join</button>
+  </div>
+
+</div>

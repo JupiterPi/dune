@@ -1,41 +1,25 @@
-import { Injectable } from '@angular/core';
-import {SocketService} from "./socket.service";
-import {Subject} from "rxjs";
-
-export type Request = {
-  id: string,
-  type: string,
-  content: string,
-}
-
-export type Response = {
-  requestId: string,
-  content: string,
-}
+import {Injectable} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
+import {environment} from "../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestsService {
-  private requests: Subject<Request> = new Subject<Request>();
+  root = environment.root;
 
-  constructor(private socket: SocketService) {
-    this.socket.onMessage("request").subscribe(request => {
-      this.requests.next(request as Request);
+  constructor(private http: HttpClient) {}
+
+  createGame() {
+    return new Observable<number>(subscriber => {
+      this.http.post<{gameId: number}>(`${this.root}/games/create`, null).subscribe(data => {
+        subscriber.next(data.gameId);
+      });
     });
   }
 
-  handleRequests(handler: (request: Request) => Response | null) {
-    this.requests.subscribe(request => {
-      const response = handler(request);
-      if (response != null) this.sendResponse(response);
-    });
-  }
-
-  getRequests() {
-    return this.requests;
-  }
-  sendResponse(response: Response) {
-    this.socket.sendMessage("request", response);
+  startGame(gameId: number) {
+    return this.http.post<void>(`${this.root}/games/${gameId}/start`, null);
   }
 }

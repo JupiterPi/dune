@@ -1,11 +1,13 @@
 package jupiterpi.dune
 
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.websocket.*
 import jupiterpi.dune.Games.configureGames
 import kotlinx.serialization.json.Json
@@ -17,8 +19,24 @@ fun main() {
 }
 
 fun Application.module() {
+    val serialization = Json {
+        classDiscriminator = "jsonClassDiscriminator"
+    }
+
     install(ContentNegotiation) {
-        json(Json { classDiscriminator = "jsonClassDiscriminator" })
+        json(serialization)
+    }
+
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+
+        allowHost("0.0.0.0:4200")
+        anyHost()
     }
 
     install(WebSockets) {
@@ -26,7 +44,7 @@ fun Application.module() {
         timeout = Duration.ofSeconds(15)
         maxFrameSize = Long.MAX_VALUE
         masking = false
-        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        contentConverter = KotlinxWebsocketSerializationConverter(serialization)
     }
 
     configureGames()

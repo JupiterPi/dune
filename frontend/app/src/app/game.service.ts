@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {SocketService} from "./socket.service";
 import {BehaviorSubject} from "rxjs";
+import {RequestsService} from "./requests.service";
 
 export type Game = {
   players: Player[],
@@ -61,6 +62,8 @@ export type IntrigueCard = {
   title: string,
 }
 
+export type RequestHandler = (payload: any) => any;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -89,6 +92,7 @@ export class GameService {
     hand: [],
     intrigueCards: [],
   });
+  private requestHandlers = new Map<string, RequestHandler>();
 
   constructor(private socket: SocketService) {
     this.socket.onMessage("game").subscribe(game => {
@@ -96,6 +100,13 @@ export class GameService {
     });
     this.socket.onMessage("playerGame").subscribe(playerGame => {
       this.playerGame.next(playerGame as PlayerGame);
+    });
+    this.socket.onMessage("request").subscribe((request: {type: string, payload: any, id: string}) => {
+      const response = this.requestHandlers.get(request.type)?.call(null, request.payload);
+      this.socket.sendMessage("request", {
+        requestId: request.id,
+        content: response
+      });
     });
   }
 
@@ -105,5 +116,9 @@ export class GameService {
 
   getPlayerGame() {
     return this.playerGame;
+  }
+
+  handleRequests(type: string, handler: RequestHandler) {
+    this.requestHandlers.set(type, handler);
   }
 }

@@ -7,6 +7,8 @@ import { GameComponent } from './ui/game/game.component';
 import {RouterModule} from "@angular/router";
 import { RichTextTestComponent } from './ui/rich-text/rich-text-test/rich-text-test.component';
 import { RichTextNodeComponent } from './ui/rich-text/rich-text-node/rich-text-node.component';
+import { LobbyComponent } from './ui/lobby/lobby.component';
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -14,14 +16,17 @@ import { RichTextNodeComponent } from './ui/rich-text/rich-text-node/rich-text-n
     BoardComponent,
     GameComponent,
     RichTextTestComponent,
-    RichTextNodeComponent
+    RichTextNodeComponent,
+    LobbyComponent,
   ],
   imports: [
     BrowserModule,
     RouterModule.forRoot([
+      { path: "", component: LobbyComponent },
       { path: "game", component: GameComponent },
-      { path: "rich-text-test", component: RichTextTestComponent },
-    ])
+      { path: "lobby", component: LobbyComponent, },
+    ]),
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

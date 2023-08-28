@@ -1,6 +1,9 @@
 <div id="container">
 
   <div class="horiz-flex">
+
+    <button *ngIf="!started" (click)="startGame()">Start</button>
+
     <div>
       <app-board></app-board>
     </div>
@@ -45,26 +48,6 @@
         </ng-container>
       </div>
 
-    </div>
-  </div>
-
-  <div *ngIf="playerGame">
-    <b>Hand:</b><br>
-    <div id="hand-cards" class="cards-container">
-      <div *ngFor="let card of playerGame.hand">
-        {{card.title}} <br>
-        <div class="card-img"><img [src]="'/assets/agent_card/' + card.id + '.jpg'" [alt]="card.title"></div>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="playerGame">
-    <b>Intrigue Cards:</b><br>
-    <div id="intrigue-cards" class="cards-container">
-      <div *ngFor="let intrigueCard of playerGame.intrigueCards">
-        {{intrigueCard.title}} <br>
-        <div class="card-img"><img [src]="'/assets/intrigue_card/' + intrigueCard.id + '.jpg'"></div>
-      </div>
     </div>
   </div>
 

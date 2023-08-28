@@ -7,7 +7,6 @@ import jupiterpi.dune.game.enums.AgentAction
 import jupiterpi.dune.game.enums.AgentCard
 import jupiterpi.dune.game.enums.Faction
 import jupiterpi.dune.game.enums.IntrigueCard
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -21,11 +20,8 @@ class PlayerConnection(private val session: DefaultWebSocketServerSession): Hand
     }
 
     override suspend fun requestMultipleChoices(title: String, choices: List<String>, min: Int, max: Int): List<Int> {
-        val results = request("SIMPLE_CHOICE", mapOf(
-            "options" to choices,
-            "min" to min,
-            "max" to max,
-        )).split(",").map { it.toInt() }
+        @Serializable data class DTO(val choices: List<String>, val min: Int, val max: Int)
+        val results = request("SIMPLE_CHOICE", DTO(choices, min, max)).split(",").map { it.toInt() }
         if (results.size !in min..max) throw Exception("Amount of results $results are not in range of $min..$max")
         return results
     }
@@ -66,21 +62,21 @@ class PlayerConnection(private val session: DefaultWebSocketServerSession): Hand
 
     // -----
 
-    private suspend fun request(type: String, payload: Any? = null) = request(UserRequest(type, payload))
-    private suspend fun request(request: UserRequest): String {
+    private suspend fun request(type: String) = request<String?>(type, null)
+    private suspend inline fun <reified T> request(type: String, payload: T) = request(UserRequest(type, payload))
+    private suspend inline fun <reified T> request(request: UserRequest<T>): String {
         session.send("request", request)
         while (true) {
-            val packet = session.receiveDeserialized<Packet>()
-            val valid = packet.topic == "request" && (packet.payload as? UserResponse)?.requestId == request.id
-            if (valid) return (packet.payload as UserResponse).content
-            else error("Unhandled packet: $packet")
+            val response = session.receive<UserResponse>("request")
+            if (response.requestId == request.id) return response.content
+            else error("Unhandled response: $response")
         }
     }
 
     @Serializable
-    data class UserRequest(
+    data class UserRequest<T>(
         val type: String,
-        @Contextual val payload: Any? = null
+        val payload: T
     ) {
         val id = UUID.randomUUID().toString()
     }
@@ -92,12 +88,21 @@ class PlayerConnection(private val session: DefaultWebSocketServerSession): Hand
     )
 }
 
-suspend fun WebSocketServerSession.send(topic: String, payload: Any) {
+suspend inline fun <reified T> WebSocketServerSession.send(topic: String, payload: T) {
     sendSerialized(Packet(topic, payload))
 }
 
+suspend inline fun <reified T> WebSocketServerSession.receive(topic: String): T {
+    while (true) {
+        val packet = receiveDeserialized<Packet<T>>()
+        println("received packet: $packet, ${packet.payload}")
+        if (packet.topic == topic) return packet.payload
+        else error("Unhandled packet: $packet")
+    }
+}
+
 @Serializable
-data class Packet(
+class Packet<T>(
     val topic: String,
-    @Contextual val payload: Any,
+    val payload: T,
 )

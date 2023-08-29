@@ -10,7 +10,7 @@ import jupiterpi.dune.game.enums.IntrigueCard
 import kotlinx.serialization.Serializable
 import java.util.*
 
-class PlayerConnection(private val session: DefaultWebSocketServerSession): Handler {
+class PlayerConnection(var session: DefaultWebSocketServerSession): Handler {
     override suspend fun refreshGameState(game: Game) {
         session.send("game", GameDTO(game))
     }

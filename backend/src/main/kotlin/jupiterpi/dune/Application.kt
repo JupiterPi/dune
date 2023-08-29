@@ -39,9 +39,7 @@ fun Application.module() {
         anyHost()
     }
 
-    install(Sessions) {
-        configurePlayerData()
-    }
+    configureAuth()
 
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(15)

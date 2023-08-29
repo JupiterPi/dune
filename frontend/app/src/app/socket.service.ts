@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from "rxjs";
 import {environment} from "../environments/environment";
+import {AuthService} from "./auth.service";
 
-interface PlayerCreateDTO {
-  name: string;
+interface PlayerJoinDTO {
   color: string;
   leader: string;
 }
@@ -16,7 +16,9 @@ export class SocketService {
   private topics = new Map<string, Subject<any>>();
   private messageQueue: string[] = [];
 
-  connect(gameId: number, playerConfiguration: PlayerCreateDTO) {
+  constructor(private auth: AuthService) {}
+
+  connect(gameId: number, playerConfiguration: PlayerJoinDTO) {
     this.ws = new WebSocket(`ws://${environment.host}/games/${gameId}/join`);
     this.ws.addEventListener("message", (message: MessageEvent) => {
       const packet = JSON.parse(message.data) as {topic: string, payload: any};
@@ -25,6 +27,7 @@ export class SocketService {
       else console.error("No listener for packet: ", packet);
     });
     this.ws.addEventListener("open", () => {
+      this.ws!!.send(JSON.stringify(this.auth.credentials));
       this.ws!!.send(JSON.stringify(playerConfiguration));
       this.messageQueue.forEach(message => this.ws!!.send(message));
     });

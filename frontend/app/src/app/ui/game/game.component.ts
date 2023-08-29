@@ -20,12 +20,10 @@ export class GameComponent {
     this.route.queryParams.subscribe(params => {
       this.gameId = params["join"];
       /*this.socket.connect(1 , {
-        name: prompt("Player name:")!!,
         color: prompt("Color (RED, GREEN, BLUE, YELLOW):")!!,
         leader: prompt("Leader (e. g. ATREIDES_PAUL):")!!
       });*/
       this.socket.connect(this.gameId!!, {
-        name: "JupiterPi",
         color: "BLUE",
         leader: "ATREIDES_PAUL"
       });

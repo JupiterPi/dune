@@ -2,14 +2,16 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../environments/environment";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestsService {
   root = environment.root;
+  authHeaders = this.auth.authHeaders;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
   createGame() {
     return new Observable<number>(subscriber => {
@@ -20,6 +22,6 @@ export class RequestsService {
   }
 
   startGame(gameId: number) {
-    return this.http.post<void>(`${this.root}/games/${gameId}/start`, null);
+    return this.http.post(`${this.root}/games/${gameId}/start`, null, {responseType: "text", headers: this.authHeaders});
   }
 }

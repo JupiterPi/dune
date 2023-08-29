@@ -9,7 +9,7 @@ class Player(
     val name: String,
     val color: Color,
     val leader: Leader,
-    var connection: PlayerConnection,
+    val connection: PlayerConnection,
 ) {
     lateinit var game: Game
 

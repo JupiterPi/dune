@@ -9,6 +9,7 @@ import { RichTextTestComponent } from './ui/rich-text/rich-text-test/rich-text-t
 import { RichTextNodeComponent } from './ui/rich-text/rich-text-node/rich-text-node.component';
 import { LobbyComponent } from './ui/lobby/lobby.component';
 import {HttpClientModule} from "@angular/common/http";
+import {CookieModule} from "ngx-cookie";
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {HttpClientModule} from "@angular/common/http";
       { path: "lobby", component: LobbyComponent, },
     ]),
     HttpClientModule,
+    CookieModule.withOptions(),
   ],
   providers: [],
   bootstrap: [AppComponent],

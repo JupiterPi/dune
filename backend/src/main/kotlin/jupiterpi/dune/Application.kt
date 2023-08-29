@@ -8,8 +8,8 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
-import jupiterpi.dune.Games.configureGames
 import kotlinx.serialization.json.Json
 import java.time.Duration
 
@@ -37,6 +37,10 @@ fun Application.module() {
 
         allowHost("0.0.0.0:4200")
         anyHost()
+    }
+
+    install(Sessions) {
+        configurePlayerData()
     }
 
     install(WebSockets) {

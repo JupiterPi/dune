@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import io.ktor.server.util.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -11,57 +12,64 @@ import jupiterpi.dune.game.Game
 import jupiterpi.dune.game.Leader
 import jupiterpi.dune.game.Player
 import kotlinx.serialization.Serializable
-import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicInteger
 
-object Games {
-    private val pendingGamesId = AtomicLong()
-    private val pendingGames = mutableMapOf<Long, PendingGame>()
+data class PlayerData(
+    val name: String,
+)
+fun SessionsConfig.configurePlayerData() {
+    cookie<PlayerData>("player_data", SessionStorageMemory())
+}
 
-    private val games = mutableMapOf<Long, Game>()
+private val lobbyId = AtomicInteger()
+private class Lobby {
+    val id = lobbyId.incrementAndGet()
+    val players = mutableListOf<Player>()
 
-    fun Application.configureGames() {
-        routing {
-            route("games") {
-                post("create") {
-                    val id = pendingGamesId.incrementAndGet()
-                    pendingGames[id] = PendingGame()
-                    call.respond(mapOf("gameId" to id))
+    lateinit var game: Game
+    val started get() = ::game.isInitialized
+    fun start() {
+        game = Game(players)
+    }
+}
+private val lobbies = mutableListOf<Lobby>()
+
+fun Application.configureGames() {
+    routing {
+        route("games") {
+            post("create") {
+                val lobby = Lobby().also { lobbies += it }
+                call.respond(mapOf("gameId" to lobby.id))
+            }
+            webSocket("{id}/join") {
+                @Serializable
+                data class PlayerJoinDTO(
+                    val name: String,
+                    val color: Player.Color,
+                    val leader: Leader,
+                )
+                val dto = receiveDeserialized<PlayerJoinDTO>()
+
+                val id: Int by call.parameters
+                val lobby = lobbies.find { it.id == id } ?: return@webSocket call.respondText("Game not found", status = HttpStatusCode.NotFound)
+
+                lobby.players += Player(dto.name, dto.color, dto.leader, PlayerConnection(this))
+
+                println("... would receive")
+
+                //TODO tmp, make the connection not close immediately
+                for (frame in incoming) {
+                    println(frame)
+                    println((frame as? Frame.Text)?.readText())
                 }
-                webSocket("{id}/join") {
-                    @Serializable
-                    data class PlayerJoinDTO(
-                        val name: String,
-                        val color: Player.Color,
-                        val leader: Leader,
-                    )
-                    val dto = receiveDeserialized<PlayerJoinDTO>()
+            }
+            post("{id}/start") {
+                val id: Int by call.parameters
+                val lobby = lobbies.find { it.id == id } ?: return@post call.respondText("Game not found", status = HttpStatusCode.NotFound)
+                lobby.start()
 
-                    val id: Long by call.parameters
-                    val pendingGame = pendingGames[id] ?: return@webSocket call.respondText("Game not found", status = HttpStatusCode.NotFound)
-
-                    pendingGame.players += Player(dto.name, dto.color, dto.leader, PlayerConnection(this))
-
-                    println("... would receive")
-
-                    //TODO tmp, make the connection not close immediately
-                    for (frame in incoming) {
-                        println(frame)
-                        println((frame as? Frame.Text)?.readText())
-                    }
-                }
-                post("{id}/start") {
-                    val id: Long by call.parameters
-                    val pendingGame = pendingGames[id] ?: return@post call.respondText("Game not found", status = HttpStatusCode.NotFound)
-                    games[id] = Game(pendingGame.players)
-                    pendingGames.remove(id)
-
-                    call.respond("")
-                }
+                call.respond("")
             }
         }
     }
-
-    data class PendingGame(
-        val players: MutableList<Player> = mutableListOf(),
-    )
 }

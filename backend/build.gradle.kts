@@ -32,4 +32,5 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-cors-jvm:2.3.3")
     implementation("io.ktor:ktor-server-cors")
+    implementation("io.ktor:ktor-server-sessions-jvm:2.3.3")
 }

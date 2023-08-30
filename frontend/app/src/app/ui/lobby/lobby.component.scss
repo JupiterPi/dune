@@ -5,6 +5,11 @@
   align-items: center;
   gap: 15px;
   margin-top: 5vh;
+
+  div {
+    display: flex;
+    gap: 10px;
+  }
 }
 
 input {

@@ -14,8 +14,11 @@ button, input {
 
 button {
   cursor: pointer;
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #f3f3f3;
+  }
+  &:disabled {
+    cursor: default;
   }
 }
 

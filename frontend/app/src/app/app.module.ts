@@ -10,6 +10,7 @@ import { RichTextNodeComponent } from './ui/rich-text/rich-text-node/rich-text-n
 import { LobbyComponent } from './ui/lobby/lobby.component';
 import {HttpClientModule} from "@angular/common/http";
 import {CookieModule} from "ngx-cookie";
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -23,12 +24,13 @@ import {CookieModule} from "ngx-cookie";
   imports: [
     BrowserModule,
     RouterModule.forRoot([
-      { path: "", component: LobbyComponent },
-      { path: "game", component: GameComponent },
-      { path: "lobby", component: LobbyComponent, },
+      {path: "", component: LobbyComponent},
+      {path: "game", component: GameComponent},
+      {path: "lobby", component: LobbyComponent,},
     ]),
     HttpClientModule,
     CookieModule.withOptions(),
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

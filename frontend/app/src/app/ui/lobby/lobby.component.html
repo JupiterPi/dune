@@ -1,10 +1,26 @@
 <div id="container">
 
-  <button (click)="createGame()">Create Game</button>
+  <h2>User</h2>
+
+  <div *ngIf="!isLoggedIn">Not logged in.</div>
+  <div *ngIf="isLoggedIn">Logged in as {{username}}.</div>
+  <div>
+    <button (click)="login()">{{isLoggedIn ? "Change Account" : "Login"}}</button>
+    <button (click)="changePassword()" *ngIf="isLoggedIn">Change Password</button>
+    <button (click)="logout()" *ngIf="isLoggedIn">Logout</button>
+  </div>
+  <div style="font-size: 80%">
+    <b>Warning</b> Keep in mind your password is transmitted and saved in clear text.
+  </div>
+
+  <h2>Game</h2>
+
+  <button (click)="createGame()" [disabled]="!isLoggedIn">Create Game</button>
   <div *ngIf="gameId != undefined" id="link">
     Share Link:
     <input [value]="gameLink" readonly>
     <button (click)="joinGame()">Join</button>
   </div>
+  <div>or join by opening the link that was shared with you.</div>
 
 </div>

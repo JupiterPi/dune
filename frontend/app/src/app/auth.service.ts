@@ -59,8 +59,8 @@ export class AuthService {
   }
 
   changePassword(newPassword: string) {
-    this.getCredentials().subscribe(credentials => {
-      return new Observable<void>(subscriber => {
+    return new Observable<void>(subscriber => {
+      this.getCredentials().subscribe(credentials => {
         this.http.post(`${environment.root}/auth/changePassword`, {password: newPassword}, {responseType: "text", headers: this.authHeaders(credentials)}).subscribe(() => {
           const newCredentials = {
             name: credentials.name,
@@ -72,5 +72,11 @@ export class AuthService {
         });
       });
     });
+  }
+
+  logout() {
+    this.isLoggedIn$.next(false);
+    this.credentials$.next(null);
+    this.cookies.remove("credentials");
   }
 }

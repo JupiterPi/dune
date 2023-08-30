@@ -36,13 +36,20 @@ export class AuthService {
     const credentials = this.cookies.getObject("credentials") as UserCredentials | undefined;
     if (credentials) {
       this.login(credentials).subscribe(valid => {
-        console.log("logged in", valid);
         if (valid) this.credentials$.next(credentials);
         else this.cookies.remove("credentials");
       });
     } else {
       this.isLoggedIn$.next(false);
     }
+  }
+
+  register(credentials: UserCredentials) {
+    return new Observable<boolean>(subscriber => {
+      this.http.post(`${environment.root}/auth/register`, credentials, {responseType: "text"}).subscribe(() => {
+        this.login(credentials).subscribe(subscriber);
+      });
+    });
   }
 
   login(credentials: UserCredentials) {

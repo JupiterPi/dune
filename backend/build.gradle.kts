@@ -1,6 +1,9 @@
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
+val exposed_version: String by project
+val h2_version: String by project
+
 
 plugins {
     kotlin("jvm") version "1.9.0"
@@ -33,4 +36,9 @@ dependencies {
     implementation("io.ktor:ktor-server-cors-jvm:2.3.3")
     implementation("io.ktor:ktor-server-cors")
     implementation("io.ktor:ktor-server-auth")
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("com.h2database:h2:$h2_version")
 }

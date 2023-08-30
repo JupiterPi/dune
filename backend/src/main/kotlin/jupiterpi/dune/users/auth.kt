@@ -1,4 +1,4 @@
-package jupiterpi.dune
+package jupiterpi.dune.users
 
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -15,17 +15,13 @@ data class UserCredentials(
     var password: String
 )
 
-val users = mutableListOf(
-    UserCredentials("JupiterPii", "password"),
-)
-private fun validateUser(name: String, password: String) = users.contains(UserCredentials(name, password))
-
 fun Application.configureAuth() {
     authentication {
         basic {
             realm = "Access to '/'"
-            validate { credentials ->
-                UserIdPrincipal(credentials.name).takeIf { validateUser(credentials.name, credentials.password) }
+            validate {
+                val credentials = UserCredentials(it.name, it.password)
+                UserIdPrincipal(credentials.name).takeIf { UserRepo.validateUser(credentials) }
             }
         }
     }
@@ -33,19 +29,20 @@ fun Application.configureAuth() {
     routing {
         route("auth") {
             post("register") {
-                users += call.receive<UserCredentials>()
+                val credentials = call.receive<UserCredentials>()
+                UserRepo.createUser(credentials)
                 call.respondText("Registered")
             }
             post("validateCredentials") {
                 val credentials = call.receive<UserCredentials>()
-                call.respond(mapOf("valid" to users.contains(credentials)))
+                call.respond(mapOf("valid" to UserRepo.validateUser(credentials)))
             }
             authenticate {
                 post("changePassword") {
                     @Serializable data class DTO(val password: String)
                     val dto = call.receive<DTO>()
                     val username = call.principal<UserIdPrincipal>()!!.name
-                    users.single { it.name == username }.password = dto.password
+                    UserRepo.changePassword(username, dto.password)
                     call.respondText("Password changed")
                 }
             }
@@ -55,7 +52,7 @@ fun Application.configureAuth() {
 
 suspend fun DefaultWebSocketServerSession.authenticate(): String? {
     val credentials = receiveDeserialized<UserCredentials>()
-    if (!validateUser(credentials.name, credentials.password)) {
+    if (!UserRepo.validateUser(credentials)) {
         close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Wrong credentials"))
         return null
     }

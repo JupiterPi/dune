@@ -11,6 +11,7 @@ import io.ktor.websocket.*
 import jupiterpi.dune.game.Game
 import jupiterpi.dune.game.Leader
 import jupiterpi.dune.game.Player
+import jupiterpi.dune.users.authenticate
 import kotlinx.serialization.Serializable
 import java.util.concurrent.atomic.AtomicInteger
 

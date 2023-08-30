@@ -23,6 +23,13 @@ export class LobbyComponent {
 
   // auth
 
+  register() {
+    const name = prompt("Username:");
+    const password = prompt("Password:");
+    if (name == null || password == null) return;
+    this.auth.register({name, password}).subscribe();
+  }
+
   login() {
     const name = prompt("Username:");
     const password = prompt("Password:");

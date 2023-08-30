@@ -31,6 +31,6 @@ object UserRepo {
     }
 
     fun changePassword(username: String, newPassword: String) {
-        transaction { User.find { Users.name eq username }.single().password == newPassword }
+        transaction { User.find { Users.name eq username }.single().password = newPassword }
     }
 }

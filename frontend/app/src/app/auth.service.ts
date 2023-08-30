@@ -86,4 +86,16 @@ export class AuthService {
     this.credentials$.next(null);
     this.cookies.remove("credentials");
   }
+
+  deleteAccount() {
+    return new Observable<void>(subscriber => {
+      this.getCredentials().subscribe(credentials => {
+        this.http.post(`${environment.root}/auth/deleteAccount`, null, {responseType: "text", headers: this.authHeaders(credentials)}).subscribe(() => {
+          this.isLoggedIn$.next(false);
+          this.credentials$.next(null);
+          subscriber.next();
+        });
+      });
+    });
+  }
 }

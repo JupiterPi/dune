@@ -19,6 +19,10 @@ class User(id: EntityID<Int>) : IntEntity(id) {
 }
 
 object UserRepo {
+    fun userExists(username: String): Boolean {
+        return transaction { User.find { Users.name eq username }.any() }
+    }
+
     fun createUser(credentials: UserCredentials) {
         transaction { User.new {
             name = credentials.name
@@ -32,5 +36,9 @@ object UserRepo {
 
     fun changePassword(username: String, newPassword: String) {
         transaction { User.find { Users.name eq username }.single().password = newPassword }
+    }
+
+    fun deleteUser(username: String) {
+        transaction { User.find { Users.name eq username }.single().delete() }
     }
 }

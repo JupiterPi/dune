@@ -8,9 +8,11 @@
   <div *ngIf="isLoggedIn">Logged in as {{username}}.</div>
   <div>
     <button (click)="register()" *ngIf="!isLoggedIn">Register</button>
-    <button (click)="login()">{{isLoggedIn ? "Change Account" : "Login"}}</button>
+    <button (click)="login()" *ngIf="!isLoggedIn">Login</button>
+
     <button (click)="changePassword()" *ngIf="isLoggedIn">Change Password</button>
     <button (click)="logout()" *ngIf="isLoggedIn">Logout</button>
+    <button (click)="deleteAccount()" *ngIf="isLoggedIn">Delete Account</button>
   </div>
   <div style="font-size: 80%">
     <b>Warning</b> Keep in mind your password is transmitted and saved in clear text.

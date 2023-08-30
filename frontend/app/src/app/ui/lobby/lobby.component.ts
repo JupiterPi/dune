@@ -49,6 +49,12 @@ export class LobbyComponent {
     this.auth.logout();
   }
 
+  deleteAccount() {
+    if (confirm(`Permanently delete account ${this.username}?`)) {
+      this.auth.deleteAccount().subscribe();
+    }
+  }
+
   // game
 
   createGame() {

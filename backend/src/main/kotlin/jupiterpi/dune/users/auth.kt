@@ -1,5 +1,6 @@
 package jupiterpi.dune.users
 
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -30,6 +31,7 @@ fun Application.configureAuth() {
         route("auth") {
             post("register") {
                 val credentials = call.receive<UserCredentials>()
+                if (UserRepo.userExists(credentials.name)) return@post call.respondText("User already exists", status = HttpStatusCode.Conflict)
                 UserRepo.createUser(credentials)
                 call.respondText("Registered")
             }
@@ -44,6 +46,11 @@ fun Application.configureAuth() {
                     val username = call.principal<UserIdPrincipal>()!!.name
                     UserRepo.changePassword(username, dto.password)
                     call.respondText("Password changed")
+                }
+                post("deleteAccount") {
+                    val username = call.principal<UserIdPrincipal>()!!.name
+                    UserRepo.deleteUser(username)
+                    call.respondText("Account deleted")
                 }
             }
         }

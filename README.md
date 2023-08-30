@@ -1,4 +1,4 @@
-# dune
-Model of the Dune: Imperium board game
+# Dune: Imperium online
+Model of the Dune: Imperium board game for online playing
 
-![frontend/src/assets/title.png](Title)
+![Title](logo.png)

@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {CookieService} from "ngx-cookie";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../environments/environment";
-import {Observable} from "rxjs";
+import {BehaviorSubject, filter, first, map, Observable} from "rxjs";
+import {isNonNull} from "../util";
 
 export interface UserCredentials {
   name: string;
@@ -13,27 +14,34 @@ export interface UserCredentials {
   providedIn: 'root'
 })
 export class AuthService {
-  credentials?: UserCredentials;
-  private setCredentials(credentials: UserCredentials) {
-    this.credentials = credentials;
-    this.cookies.putObject("credentials", credentials);
+  isLoggedIn$ = new BehaviorSubject<boolean|null>(null);
+  credentials$ = new BehaviorSubject<UserCredentials|null>(null);
+
+  getIsLoggedIn() {
+    return this.isLoggedIn$.pipe(filter(isNonNull), first())
   }
 
-  get loggedIn() {
-    return this.credentials != undefined;
+  getCredentials() {
+    return this.credentials$.pipe(filter(isNonNull), first());
   }
-  get authHeaders() {
-    return this.credentials != undefined ? {
-      "Authorization": `Basic ${btoa(this.credentials!!.name + ":" + this.credentials!!.password)}`
-    } : undefined;
+
+  getAuthHeaders() {
+    return this.getCredentials().pipe(map(this.authHeaders));
+  }
+  private authHeaders(credentials: UserCredentials) {
+    return { "Authorization": `Basic ${btoa(credentials.name + ":" + credentials.password)}` };
   }
 
   constructor(private http: HttpClient, private cookies: CookieService) {
     const credentials = this.cookies.getObject("credentials") as UserCredentials | undefined;
     if (credentials) {
       this.login(credentials).subscribe(valid => {
-        if (!valid) this.cookies.remove("credentials");
+        console.log("logged in", valid);
+        if (valid) this.credentials$.next(credentials);
+        else this.cookies.remove("credentials");
       });
+    } else {
+      this.isLoggedIn$.next(false);
     }
   }
 
@@ -41,19 +49,27 @@ export class AuthService {
     return new Observable<boolean>(subscriber => {
       this.http.post<{valid: boolean}>(`${environment.root}/auth/validateCredentials`, credentials).subscribe(result => {
         subscriber.next(result.valid);
-        if (result.valid) this.setCredentials(credentials);
+        this.isLoggedIn$.next(result.valid);
+        if (result.valid) {
+          this.credentials$.next(credentials);
+          this.cookies.putObject("credentials", credentials);
+        }
       });
     });
   }
 
   changePassword(newPassword: string) {
-    return new Observable<void>(subscriber => {
-      this.http.post(`${environment.root}/auth/changePassword`, {password: newPassword}, {responseType: "text", headers: this.authHeaders}).subscribe(() => {
-        this.setCredentials({
-          name: this.credentials!!.name,
-          password: newPassword,
+    this.getCredentials().subscribe(credentials => {
+      return new Observable<void>(subscriber => {
+        this.http.post(`${environment.root}/auth/changePassword`, {password: newPassword}, {responseType: "text", headers: this.authHeaders(credentials)}).subscribe(() => {
+          const newCredentials = {
+            name: credentials.name,
+            password: newPassword,
+          };
+          this.credentials$.next(newCredentials);
+          this.cookies.putObject("credentials", newCredentials);
+          subscriber.next();
         });
-        subscriber.next();
       });
     });
   }

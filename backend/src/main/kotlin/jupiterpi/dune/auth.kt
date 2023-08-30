@@ -5,6 +5,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
+import io.ktor.websocket.*
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,7 +18,7 @@ data class UserCredentials(
 val users = mutableListOf(
     UserCredentials("JupiterPii", "password"),
 )
-fun validateUser(name: String, password: String) = users.contains(UserCredentials(name, password))
+private fun validateUser(name: String, password: String) = users.contains(UserCredentials(name, password))
 
 fun Application.configureAuth() {
     authentication {
@@ -49,4 +51,13 @@ fun Application.configureAuth() {
             }
         }
     }
+}
+
+suspend fun DefaultWebSocketServerSession.authenticate(): String? {
+    val credentials = receiveDeserialized<UserCredentials>()
+    if (!validateUser(credentials.name, credentials.password)) {
+        close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Wrong credentials"))
+        return null
+    }
+    return credentials.name
 }

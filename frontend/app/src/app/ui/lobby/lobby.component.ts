@@ -12,11 +12,15 @@ export class LobbyComponent {
   gameId?: number;
 
   constructor(private requests: RequestsService, private router: Router, private auth: AuthService) {
-    if (!this.auth.loggedIn) {
-      const name = prompt("Username:")!!;
-      const password = prompt("Password:")!!;
-      this.auth.login({name, password}).subscribe();
-    }
+    this.auth.getIsLoggedIn().subscribe(isLoggedIn => {
+      if (!isLoggedIn) {
+        const name = prompt("Username:")!!;
+        const password = prompt("Password:")!!;
+        this.auth.login({name, password}).subscribe(valid => {
+          if (!valid) alert("Invalid credentials! Refresh to log in again.");
+        });
+      } else console.log("is logged in");
+    });
   }
 
   createGame() {
@@ -31,6 +35,6 @@ export class LobbyComponent {
   }
 
   joinGame() {
-    this.router.navigate(["game"], {queryParams: { "join": this.gameId }})
+    this.router.navigate(["game"], {queryParams: { "join": this.gameId }});
   }
 }

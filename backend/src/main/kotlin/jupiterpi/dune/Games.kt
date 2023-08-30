@@ -20,7 +20,7 @@ private class Lobby {
     val players = mutableListOf<Player>()
 
     lateinit var game: Game
-    val started get() = ::game.isInitialized
+    val isStarted get() = ::game.isInitialized
     fun start() {
         game = Game(players)
     }
@@ -35,8 +35,7 @@ fun Application.configureGames() {
                 call.respond(mapOf("gameId" to lobby.id))
             }
             webSocket("{id}/join") {
-                val credentials = receiveDeserialized<UserCredentials>()
-                if (!validateUser(credentials.name, credentials.password)) return@webSocket close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Wrong credentials"))
+                val username = authenticate() ?: return@webSocket
 
                 @Serializable
                 data class PlayerJoinDTO(
@@ -46,12 +45,17 @@ fun Application.configureGames() {
                 val dto = receiveDeserialized<PlayerJoinDTO>()
 
                 val id: Int by call.parameters
-                val lobby = lobbies.singleOrNull { it.id == id } ?: return@webSocket call.respondText("Game not found", status = HttpStatusCode.NotFound)
+                val lobby = lobbies.singleOrNull { it.id == id } ?: return@webSocket close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Game not found"))
 
-                if (lobby.players.any { it.name == credentials.name }) {
-                    lobby.players.single { it.name == credentials.name }.connection.session = this
+                if (lobby.players.any { it.name == username }) {
+                    val player = lobby.players.single { it.name == username }
+                    player.connection.session = this
+                    if (lobby.isStarted) {
+                        player.connection.refreshGameState(lobby.game)
+                        player.connection.refreshPlayerGameStates(player)
+                    }
                 } else {
-                    lobby.players += Player(credentials.name, dto.color, dto.leader, PlayerConnection(this))
+                    lobby.players += Player(username, dto.color, dto.leader, PlayerConnection(this))
                 }
 
                 //TODO tmp, make the connection not close immediately
@@ -66,7 +70,7 @@ fun Application.configureGames() {
                     val id: Int by call.parameters
                     val lobby = lobbies.singleOrNull { it.id == id } ?: return@post call.respondText("Game not found", status = HttpStatusCode.NotFound)
                     if (lobby.players.none { it.name == username }) return@post call.respondText("Player not in the game", status = HttpStatusCode.Forbidden)
-                    if (lobby.started) return@post call.respondText("Game already started", status = HttpStatusCode.Conflict)
+                    if (lobby.isStarted) return@post call.respondText("Game already started", status = HttpStatusCode.Conflict)
                     lobby.start()
                     call.respondText("Started")
                 }

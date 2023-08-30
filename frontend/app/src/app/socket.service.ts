@@ -27,13 +27,16 @@ export class SocketService {
       else console.error("No listener for packet: ", packet);
     });
     this.ws.addEventListener("open", () => {
-      this.ws!!.send(JSON.stringify(this.auth.credentials));
-      this.ws!!.send(JSON.stringify(playerConfiguration));
-      this.messageQueue.forEach(message => this.ws!!.send(message));
+      this.auth.getCredentials().subscribe(credentials => {
+        this.ws!!.send(JSON.stringify(credentials));
+        this.ws!!.send(JSON.stringify(playerConfiguration));
+        this.messageQueue.forEach(message => this.ws!!.send(message));
+      });
     });
 
-    //TODO tmp
-    this.ws.addEventListener("close", event => console.log("Closed:", event.code, "reason", event.reason, event.wasClean, "."));
+    this.ws.addEventListener("close", event => {
+      if (event.code != 1000) console.error("WebSocket connection closed:", event.code, event.reason);
+    });
   }
 
   onMessage(topic: string): Observable<any> {

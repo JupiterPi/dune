@@ -9,9 +9,13 @@ import {AuthService} from "./auth.service";
 })
 export class RequestsService {
   root = environment.root;
-  authHeaders = this.auth.authHeaders;
+  authHeaders?: any;
 
-  constructor(private http: HttpClient, private auth: AuthService) {}
+  constructor(private http: HttpClient, private auth: AuthService) {
+    this.auth.getAuthHeaders().subscribe(authHeaders => {
+      this.authHeaders = authHeaders;
+    });
+  }
 
   createGame() {
     return new Observable<number>(subscriber => {
